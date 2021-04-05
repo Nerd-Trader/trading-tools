@@ -3,4 +3,4 @@
 CLI tool for obtaining list of ticker symbols.
 
 Currently supported resources:
- - finviz.com
+ - [finviz.com](https://finviz.com/)

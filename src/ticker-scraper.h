@@ -17,7 +17,7 @@ typedef enum MarketPlaces
     NASDAQ = (1 << 2)
 } MarketPlace;
 
-typedef char Symbol[6];
+typedef char Symbol[7];
 
 int strpos(const char *source, const char *search);
 

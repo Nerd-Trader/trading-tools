@@ -1,6 +1,6 @@
 # ticker-scraper
 
-CLI tool for obtaining list of ticker symbols.
+CLI tool for scraping stock market tickers.
 
 Currently supported resources:
  - [finviz.com](https://finviz.com/)
@@ -13,4 +13,4 @@ Currently supported resources:
 
 ## How to run
 
-    make run > /tmp/tickers.txt
+    make run > /tmp/tickers.csv

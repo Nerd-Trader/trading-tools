@@ -1,6 +1,6 @@
 PROG_NAME = ticker-scraper
 
-CFLAGS = -std=c99 -s -pedantic -Wall -Wextra -Wfatal-errors -pedantic-errors -D_XOPEN_SOURCE=500 -D_POSIX_C_SOURCE=200809L # -O3
+CFLAGS = -std=c99 -s -pedantic -Wall -Wextra -Wfatal-errors -pedantic-errors -D_XOPEN_SOURCE=500 -D_POSIX_C_SOURCE=200809L -O3
 CC     = gcc $(CFLAGS)
 
 all: $(PROG_NAME)

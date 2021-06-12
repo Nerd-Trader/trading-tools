@@ -43,7 +43,7 @@ char *mplace2str(MarketPlace marketplace)
 
 int ticker_scraper_add(MarketPlace marketplace, Symbol symbol, char *company_name)
 {
-    printf("%s\n", symbol);
+    printf("\"%s\",\"%s\",\"%s\"\n", mplace2str(marketplace), symbol, company_name);
 
     return 1;
 }
@@ -55,7 +55,7 @@ int scrape_ticker_symbols(MarketPlace marketplace)
         case AMEX:
         case NYSE:
         case NASDAQ:
-#if NERD_TRADER_DEBUG
+#if DEBUG
             fprintf(stderr, "Scraping FinViz ticker symbols from marketplace %s…\n", mplace2str(marketplace));
 #endif
             return ticker_scraper_scrape_finviz(marketplace);

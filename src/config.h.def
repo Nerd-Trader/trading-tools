@@ -1,5 +1,5 @@
 #pragma once
 
-#define NERD_TRADER_DEBUG            false
-#define NERD_TRADER_USER_AGENT       "-"
-#define NERD_TRADER_FINVIZ_SCAN_URL  "https://finviz.com/screener.ashx?v=110&f=cap_smallunder,sh_price_u15"
+#define DEBUG                    false
+#define USER_AGENT               "-"
+#define RESOURCE_FINVIZ_SCAN_URL "https://finviz.com/screener.ashx?v=110&f=cap_smallunder,sh_price_u15"

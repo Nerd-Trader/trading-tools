@@ -94,8 +94,8 @@ void finviz_scrape_page(struct MemoryStruct *chunk, MarketPlace marketplace)
     chunk->size = 0; /* No data at this point */
 
     /* Specify the URL to get */
-    char url[strlen(NERD_TRADER_FINVIZ_SCAN_URL) + 10 + 5 + 1];
-    strncpy(url, NERD_TRADER_FINVIZ_SCAN_URL, sizeof(url) - 1);
+    char url[strlen(RESOURCE_FINVIZ_SCAN_URL) + 10 + 5 + 1];
+    strncpy(url, RESOURCE_FINVIZ_SCAN_URL, sizeof(url) - 1);
     url[sizeof(url)-1] = '\0';
 
     switch (marketplace) {
@@ -127,7 +127,7 @@ void finviz_scrape_page(struct MemoryStruct *chunk, MarketPlace marketplace)
     /* Get it! */
     res = curl_easy_perform(curl_handle);
 
-#if NERD_TRADER_DEBUG
+#if DEBUG
     fprintf(stderr, "Scraping page %d: %s\n", page, url);
 #endif
 
@@ -141,7 +141,7 @@ void finviz_scrape_page(struct MemoryStruct *chunk, MarketPlace marketplace)
             page = (page * FINVIZ_PP < finviz_parse_page_get_total(chunk)) ? page + 1 : 0;
         } else {
             fprintf(stderr, "Error scraping page %s\n", url);
-#if NERD_TRADER_DEBUG
+#if DEBUG
             fprintf(stderr, "%s\n", chunk->memory);
 #endif
         }

@@ -15,7 +15,7 @@ size_t nerd_trader_curl_write_memory_callback(void *contents, size_t size,
 
     mem->memory = realloc(mem->memory, mem->size + realsize + 1);
     if (mem->memory == NULL) {
-#if NERD_TRADER_DEBUG
+#if DEBUG
         fprintf(stderr, "Out of memory!\n");
 #endif
         return 0;
@@ -41,7 +41,7 @@ CURL *nerd_trader_curl_init(MemoryStruct *chunk)
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void*)chunk);
     /* Some servers don't like requests that are made without a user-agent
         field, so we provide one */
-    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, NERD_TRADER_USER_AGENT);
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, USER_AGENT);
     /* Enable all supported built-in compressions */
     curl_easy_setopt(curl_handle, CURLOPT_ACCEPT_ENCODING, "gzip");
     curl_easy_setopt(curl_handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);

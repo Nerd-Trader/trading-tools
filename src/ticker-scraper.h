@@ -1,10 +1,5 @@
 #pragma once
 
-/* compat */
-#ifndef REG_NOERROR
-#define REG_NOERROR 0
-#endif
-
 #define true  1
 #define false 0
 
@@ -19,9 +14,17 @@ typedef enum MarketPlaces
 
 typedef char Symbol[7];
 
-int strpos(const char *source, const char *search);
+typedef struct DataRow {
+    MarketPlace marketplace;
+    Symbol ticker;
+    char company[512];
+    char sector[512];
+    char industry[512];
+    char country[512];
+    char marketcap[512];
+} DataRow;
 
-char *mplace2str(MarketPlace marketplace);
+char *marketplace_to_str(MarketPlace marketplace);
 
 int scrape_ticker_symbols(MarketPlace marketplace);
-int ticker_scraper_add(MarketPlace marketplace, Symbol symbol, char *company_name);
+int ticker_scraper_add(DataRow *dataRow);

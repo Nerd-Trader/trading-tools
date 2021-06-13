@@ -9,18 +9,7 @@
 #include "resources/finviz.h"
 #include "ticker-scraper.h"
 
-int strpos(const char *source, const char *search)
-{
-    char *found = strstr(source, search);
-
-    if (found != NULL) {
-        return found - source;
-    }
-
-    return -1;
-}
-
-char *mplace2str(MarketPlace marketplace)
+char *marketplace_to_str(MarketPlace marketplace)
 {
     switch (marketplace)
     {
@@ -41,9 +30,17 @@ char *mplace2str(MarketPlace marketplace)
     }
 }
 
-int ticker_scraper_add(MarketPlace marketplace, Symbol symbol, char *company_name)
+int ticker_scraper_add(DataRow *dataRow)
 {
-    printf("\"%s\",\"%s\",\"%s\"\n", mplace2str(marketplace), symbol, company_name);
+    printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+        marketplace_to_str(dataRow->marketplace),
+        dataRow->ticker,
+        dataRow->company,
+        dataRow->sector,
+        dataRow->industry,
+        dataRow->country,
+        dataRow->marketcap
+    );
 
     return 1;
 }
@@ -56,7 +53,7 @@ int scrape_ticker_symbols(MarketPlace marketplace)
         case NYSE:
         case NASDAQ:
 #if DEBUG
-            fprintf(stderr, "Scraping FinViz ticker symbols from marketplace %s…\n", mplace2str(marketplace));
+            fprintf(stderr, "Scraping %s FinViz ticker symbols…\n", marketplace_to_str(marketplace));
 #endif
             return ticker_scraper_scrape_finviz(marketplace);
         break;
@@ -93,6 +90,8 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
     }
+
+    puts("marketplace,ticker,company,sector,industry,country,marketcap");
 
     new_symbols_retrieved = 0;
 

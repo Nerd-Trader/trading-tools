@@ -3,7 +3,7 @@
 #include <curl/curl.h>
 
 typedef struct MemoryStruct {
-    char   *memory;
+    char *memory;
     size_t size;
 } MemoryStruct;
 

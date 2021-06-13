@@ -36,7 +36,8 @@ CURL *nerd_trader_curl_init(MemoryStruct *chunk)
     /* Init the curl session */
     curl_handle = curl_easy_init();
     /* Send all data to this function */
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, nerd_trader_curl_write_memory_callback);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION,
+                        nerd_trader_curl_write_memory_callback);
     /* We pass our 'chunk' struct to the callback function */
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void*)chunk);
     /* Some servers don't like requests that are made without a user-agent

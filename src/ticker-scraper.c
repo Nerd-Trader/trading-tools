@@ -5,9 +5,32 @@
 #include <errno.h>
 #include <string.h>
 
+
+#include <csv.h>
+
 #include "config.h"
 #include "resources/finviz.h"
 #include "ticker-scraper.h"
+
+size_t csv_col_idx = 0;
+struct csv_parser parser;
+unsigned char csv_options = CSV_STRICT | CSV_APPEND_NULL;
+
+void csv_cb1(void *s, size_t i, void *outfile) {
+    csv_fwrite((FILE *)outfile, s, i);
+
+    if (csv_col_idx < 6) { /* Do not put separator after last column */
+        fputc(CSV_COMMA, (FILE *)outfile);
+    }
+
+    csv_col_idx++;
+}
+
+void csv_cb2(int c, void *outfile) {
+    fputc('\n', (FILE *)outfile);
+
+    csv_col_idx = 0;
+}
 
 char *marketplace_to_str(MarketPlace marketplace)
 {
@@ -32,15 +55,21 @@ char *marketplace_to_str(MarketPlace marketplace)
 
 int ticker_scraper_add(DataRow *dataRow)
 {
-    printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
-        marketplace_to_str(dataRow->marketplace),
-        dataRow->ticker,
-        dataRow->company,
-        dataRow->sector,
-        dataRow->industry,
-        dataRow->country,
-        dataRow->marketcap
-    );
+    char *marketplace = marketplace_to_str(dataRow->marketplace);
+    csv_parse(&parser, marketplace, strlen(marketplace), csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, ",", 1, csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, dataRow->ticker, strlen(dataRow->ticker), csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, ",", 1, csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, dataRow->company, strlen(dataRow->company), csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, ",", 1, csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, dataRow->sector, strlen(dataRow->sector), csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, ",", 1, csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, dataRow->industry, strlen(dataRow->industry), csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, ",", 1, csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, dataRow->country, strlen(dataRow->country), csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, ",", 1, csv_cb1, csv_cb2, stdout);
+    csv_parse(&parser, dataRow->marketcap, strlen(dataRow->marketcap), csv_cb1, csv_cb2, stdout);
+    csv_fini(&parser, csv_cb1, csv_cb2, stdout);
 
     return 1;
 }
@@ -91,7 +120,16 @@ int main(int argc, char **argv)
         }
     }
 
-    puts("marketplace,ticker,company,sector,industry,country,marketcap");
+    int ret = csv_init(&parser, csv_options);
+    if (ret) {
+        fprintf(stderr, "Error: Couldn’t initialize CSV parser.");
+        return EXIT_FAILURE;
+    }
+    csv_set_delim(&parser, CSV_COMMA);
+
+    const char *csv_header = "marketplace,ticker,company,sector,industry,country,marketcap";
+    csv_parse(&parser, csv_header, strlen(csv_header), csv_cb1, csv_cb2, stdout);
+    csv_fini(&parser, csv_cb1, csv_cb2, stdout);
 
     new_symbols_retrieved = 0;
 
@@ -107,5 +145,7 @@ int main(int argc, char **argv)
         new_symbols_retrieved += scrape_ticker_symbols(AMEX);
     }
 
-    return (new_symbols_retrieved > 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+    csv_free(&parser);
+
+    return EXIT_SUCCESS;
 }

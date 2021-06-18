@@ -30,6 +30,7 @@ bin/$(PROG_NAME): prepare config
 		src/curl.c \
 		src/$(PROG_NAME).c \
 		src/resources/finviz.c \
+		-lcsv \
 		-lcurl \
 		-ltidy \
 		-o bin/$(PROG_NAME)

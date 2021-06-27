@@ -17,22 +17,93 @@ typedef unsigned long ulong; /* Needed by tidy/tidy.h */
 
 #define FINVIZ_PP 20 /* How many results per page finviz.com displays */
 
+const char *html_entities[][2] = {
+   { "&amp;",  "&" },
+   { "&apos;", "'" },
+   { "&gt;",   ">" },
+   { "&lt;",   "<" },
+   { "&quot;", "\"" },
+   { "&copy;", "©" }
+};
+
 CURL *curl_handle;
 unsigned int m;
 char *cursor;
 int page, total, new;
+
+char *str_replace(const char *input, const char *pattern, const char *replacement)
+{
+    size_t numhits, pattern_len, replacement_len, output_len;
+    const char *input_at = NULL;
+    const char *input_prev = NULL;
+    char *output = NULL;
+    char *output_at = NULL;
+
+    pattern_len = strlen(pattern);
+    replacement_len = strlen(replacement);
+    numhits = 0;
+    input_at = input;
+
+    while ((input_at = strstr(input_at, pattern))) {
+        input_at += pattern_len;
+        numhits++;
+    }
+
+    output_len = strlen(input) - pattern_len * numhits + replacement_len * numhits;
+    output = (char *)malloc(output_len + 1);
+
+    output_at = output;
+    input_at = input_prev = input;
+
+    while ((input_at = strstr(input_at, pattern))) {
+        memcpy(output_at, input_prev, input_at - input_prev);
+        output_at += input_at - input_prev;
+        memcpy(output_at, replacement, replacement_len);
+        output_at += replacement_len;
+        input_at += pattern_len;
+        input_prev = input_at;
+    }
+
+    strcpy(output_at, input_prev);
+
+    return output;
+}
+
+static void sanitize_entities(const char *data, char *str, const size_t len)
+{
+    char sanitized_data[256];
+
+    strncpy(sanitized_data, data, sizeof(sanitized_data) - 1);
+
+    for (size_t i = 0; i < sizeof(html_entities) / sizeof(html_entities[0]); i++) {
+        const char *find_string = html_entities[i][0];
+        const char *replace_string = html_entities[i][1];
+
+        if (strstr(sanitized_data, find_string) != 0) {
+            char *tmp = str_replace(sanitized_data, find_string, replace_string);
+
+            strncpy(sanitized_data, tmp, sizeof(sanitized_data) - 1);
+
+            free(tmp);
+        }
+   }
+
+   strncpy(str, sanitized_data, len);
+}
 
 void extract_text(TidyDoc doc, TidyNode tnod, char *destination, ulong max_size)
 {
     TidyBuffer buf;
     tidyBufInit(&buf);
     tidyNodeGetText(doc, tnod, &buf);
-    strncpy(destination, (char *)buf.bp, max_size - 1);
-    if (strlen((char *)buf.bp) < max_size) {
-        destination[strlen((char *)buf.bp) - 1] = '\0';
+    sanitize_entities((char *)buf.bp, destination, max_size - 1);
+
+    if (strlen((char *)destination) < max_size) {
+        destination[strlen((char *)destination) - 1] = '\0';
     } else {
         destination[max_size - 1] = '\0';
     }
+
     tidyBufFree(&buf);
 }
 
@@ -254,15 +325,15 @@ int ticker_scraper_scrape_finviz(MarketPlace marketplace)
 {
     struct MemoryStruct chunk;
 
-    /* Init the curl */
+    /* Init curl */
     curl_handle = nerd_trader_curl_init(&chunk);
 
     page = 1;
     total = new = 0;
 
     while (page > 0) {
-        /* Avoid "Too many requests." error */
         if (page > 1) {
+            /* Delay to avoid the "Too many requests" error */
             sleep(1);
         }
 

@@ -38,8 +38,12 @@ char *marketplace_to_str(MarketPlace marketplace)
 {
     switch (marketplace)
     {
+        /*
+           This is now called NYSE American, it's part of NYSE.
+           Was called NYSE MKT prior, AMEX earlier.
+        */
         case AMEX:
-            return "AMEX";
+            return "NYSE";
         break;
 
         case NYSE:
@@ -146,11 +150,10 @@ int main(int argc, char **argv)
         scan_nyse = true;
     } else {
         for (int i = 1; i < argc; i++) {
-            if (0 == strcmp(argv[i], "AMEX")) {
-                scan_amex = true;
-            } else if (0 == strcmp(argv[i], "NASDAQ")) {
+            if (0 == strcmp(argv[i], "NASDAQ")) {
                 scan_nasdaq = true;
             } else if (0 == strcmp(argv[i], "NYSE")) {
+                scan_amex = true;
                 scan_nyse = true;
             }
         }

@@ -1,9 +1,10 @@
 # ticker-scraper
 
-CLI tool for scraping stock market tickers.
+CLI tool for scraping stock market ticker data.
 
-Currently supported resources:
- - [finviz.com](https://finviz.com/)
+Currently supported markets:
+ - NYSE, NASDAQ (via [finviz.com](https://finviz.com/))
+ - OTCQX, OTCQB, Pink sheets (via [otcmarkets.com](https://otcmarkets.com/))
 
 
 ## How to build
@@ -13,4 +14,8 @@ Currently supported resources:
 
 ## How to run
 
-    make run > /tmp/tickers.csv
+    bin/ticker-scraper > /tmp/tickers.csv
+
+or
+
+    bin/ticker-scraper NYSE NASDAQ OTCQX OTCQX Pink > /tmp/all-tickers.csv

@@ -9,7 +9,10 @@ typedef enum MarketPlaces
 {
     AMEX   = (1 << 0),
     NYSE   = (1 << 1),
-    NASDAQ = (1 << 2)
+    NASDAQ = (1 << 2),
+    OTCQX  = (1 << 3),
+    OTCQB  = (1 << 4),
+    PINK   = (1 << 5)
 } MarketPlace;
 
 typedef char Symbol[7];

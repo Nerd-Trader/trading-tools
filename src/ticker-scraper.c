@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include "resources/finviz.h"
+#include "resources/otcmarkets.h"
 #include "ticker-scraper.h"
 
 void explicit_bzero(void *s, size_t n);
@@ -29,6 +30,8 @@ void csv_cb_end_of_field(void *s, size_t i, void *outfile) {
 }
 
 void csv_cb_end_of_row(int c, void *outfile) {
+    (void)(c); // Suppress "unused parameter" compiler warning
+
     fputc('\n', (FILE *)outfile);
 
     csv_field_index = 0;
@@ -45,13 +48,21 @@ char *marketplace_to_str(MarketPlace marketplace)
         case AMEX:
             return "NYSE";
         break;
-
         case NYSE:
             return "NYSE";
         break;
-
         case NASDAQ:
             return "NASDAQ";
+        break;
+
+        case OTCQX:
+            return "OTCQX";
+        break;
+        case OTCQB:
+            return "OTCQB";
+        break;
+        case PINK:
+            return "Pink";
         break;
 
         default:
@@ -130,6 +141,15 @@ int scrape_ticker_symbols(MarketPlace marketplace)
             fprintf(stderr, "Scraping %s FinViz ticker symbols…\n", marketplace_to_str(marketplace));
 #endif
             return ticker_scraper_scrape_finviz(marketplace);
+        break;
+
+        case OTCQX:
+        case OTCQB:
+        case PINK:
+#if DEBUG
+            fprintf(stderr, "Scraping %s OTC Markets ticker symbols…\n", marketplace_to_str(marketplace));
+#endif
+            return ticker_scraper_scrape_otcmarkets(marketplace);
         break;
     }
 

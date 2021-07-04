@@ -1,6 +1,7 @@
 PROG_NAME = ticker-scraper
 
 CFLAGS = -std=c99 -s -pedantic -Wall -Wextra -Wfatal-errors -pedantic-errors -D_XOPEN_SOURCE=500 -D_POSIX_C_SOURCE=200809L -O3
+CFLAGS += $(shell pkg-config --cflags json-c)
 CC     = cc $(CFLAGS)
 
 all: $(PROG_NAME)
@@ -30,9 +31,11 @@ bin/$(PROG_NAME): prepare config
 		src/curl.c \
 		src/$(PROG_NAME).c \
 		src/resources/finviz.c \
+		src/resources/otcmarkets.c \
 		-lcsv \
 		-lcurl \
 		-ltidy \
+		$(shell pkg-config --libs json-c) \
 		-o bin/$(PROG_NAME)
 
 run:

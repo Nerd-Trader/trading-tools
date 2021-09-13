@@ -658,15 +658,15 @@ const char *otcmarkets_industries[][2] = {
     { "X-ray apparatus and tubes", "3844" }
 };
 
+char otcmarkets_markets_otcqb[] = {
+    10 // OTCQB
+};
+
 char otcmarkets_markets_otcqx[] = {
     6, // OTCQX International
     5, // OTCQX International Premier
     2, // UTCQX U.S.
     1  // UTCQX U.S. Premier
-};
-
-char otcmarkets_markets_otcqb[] = {
-    10 // OTCQB
 };
 
 char otcmarkets_markets_pink[] = {
@@ -847,9 +847,6 @@ int ticker_scraper_scrape_otcmarkets(const MarketPlace marketplace)
 
     /* Iterate over industries, splitting */
     for (int i = 0, ilen = sizeof(otcmarkets_industries) / sizeof(otcmarkets_industries[0]); i < ilen; i++) {
-        /* Delay to avoid the "Too many requests" error */
-        sleep(1);
-
         new += otcmarkets_retrieve_csv_file_for_industry(&chunk, marketplace, otcmarkets_industries[i]);
     }
 

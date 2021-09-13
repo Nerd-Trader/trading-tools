@@ -30,6 +30,7 @@ bin/$(PROG_NAME): prepare config
 		src/curl.c \
 		src/$(PROG_NAME).c \
 		src/resources/finviz.c \
+		src/resources/otcmarkets.c \
 		-lcsv \
 		-lcurl \
 		-ltidy \

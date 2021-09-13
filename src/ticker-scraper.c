@@ -41,28 +41,21 @@ char *marketplace_to_str(MarketPlace marketplace)
 {
     switch (marketplace)
     {
-        /*
-           This is now called NYSE American, it's part of NYSE.
-           Was called NYSE MKT prior, AMEX earlier.
-        */
-        case AMEX:
-            return "NYSE";
-        break;
-
-        case NYSE:
-            return "NYSE";
-        break;
-
         case NASDAQ:
             return "NASDAQ";
         break;
 
-        case OTCQX:
-            return "OTCQX";
+        case NYSE:
+        case AMEX:
+            return "NYSE";
         break;
 
         case OTCQB:
             return "OTCQB";
+        break;
+
+        case OTCQX:
+            return "OTCQX";
         break;
 
         case PINK:
@@ -136,15 +129,23 @@ int ticker_scraper_add(DataRow *dataRow)
 
 int scrape_ticker_symbols(MarketPlace marketplace)
 {
+    int new = 0;
+
     switch (marketplace)
     {
         case AMEX:
+            // Just a placeholder, no point in letting it being scraped separately from NYSE
+            break;
         case NYSE:
         case NASDAQ:
 #if DEBUG
             fprintf(stderr, "Scraping %s tickers…\n", marketplace_to_str(marketplace));
 #endif
-            return ticker_scraper_scrape_finviz(marketplace);
+            new = ticker_scraper_scrape_finviz(marketplace);
+            if (marketplace == NYSE) {
+                // Finviz requires NYSE American to be scraped separately, as legacy "AMEX"
+                new += ticker_scraper_scrape_finviz(AMEX);
+            }
         break;
 
         case OTCQX:
@@ -153,26 +154,24 @@ int scrape_ticker_symbols(MarketPlace marketplace)
 #if DEBUG
             fprintf(stderr, "Scraping %s tickers…\n", marketplace_to_str(marketplace));
 #endif
-            return ticker_scraper_scrape_otcmarkets(marketplace);
+            new = ticker_scraper_scrape_otcmarkets(marketplace);
         break;
     }
 
-    return 0;
+    return new;
 }
 
 int main(int argc, char **argv)
 {
     unsigned int new_symbols_retrieved = 0;
     bool no_params_provided = argc < 2;
-    bool scan_amex = false,
-         scan_nasdaq = false,
+    bool scan_nasdaq = false,
          scan_nyse = false,
-         scan_otcqx = false,
          scan_otcqb = false,
+         scan_otcqx = false,
          scan_pink = false;
 
     if (no_params_provided) {
-        scan_amex = true;
         scan_nasdaq = true;
         scan_nyse = true;
     } else {
@@ -180,26 +179,24 @@ int main(int argc, char **argv)
             if (0 == strcmp(argv[i], "NASDAQ")) {
                 scan_nasdaq = true;
             } else if (0 == strcmp(argv[i], "NYSE")) {
-                scan_amex = true;
                 scan_nyse = true;
-            } else if (0 == strcmp(argv[i], "OTCQX")) {
-                scan_otcqx = true;
             } else if (0 == strcmp(argv[i], "OTCQB")) {
                 scan_otcqb = true;
+            } else if (0 == strcmp(argv[i], "OTCQX")) {
+                scan_otcqx = true;
             } else if (0 == strcmp(argv[i], "Pink")) {
                 scan_pink = true;
             } else if (0 == strcmp(argv[i], "US")) {
                 scan_nasdaq = true;
-                scan_amex = true;
                 scan_nyse = true;
             } else if (0 == strcmp(argv[i], "OTC")) {
-                scan_otcqx = true;
                 scan_otcqb = true;
+                scan_otcqx = true;
                 scan_pink = true;
             }
         }
 
-        if (!scan_amex && !scan_nasdaq && !scan_nyse && !scan_otcqx && !scan_otcqb && !scan_pink) {
+        if (!scan_nasdaq && !scan_nyse && !scan_otcqb && !scan_otcqx && !scan_pink) {
             fprintf(stderr, "No correct marketplace parameters provided\n");
             exit(EXIT_FAILURE);
         }
@@ -217,21 +214,20 @@ int main(int argc, char **argv)
 
     new_symbols_retrieved = 0;
 
+    // US
     if (scan_nasdaq) {
         new_symbols_retrieved += scrape_ticker_symbols(NASDAQ);
     }
     if (scan_nyse) {
         new_symbols_retrieved += scrape_ticker_symbols(NYSE);
     }
-    if (scan_amex) {
-        new_symbols_retrieved += scrape_ticker_symbols(AMEX);
-    }
 
-    if (scan_otcqx) {
-        new_symbols_retrieved += scrape_ticker_symbols(OTCQX);
-    }
+    // OTC
     if (scan_otcqb) {
         new_symbols_retrieved += scrape_ticker_symbols(OTCQB);
+    }
+    if (scan_otcqx) {
+        new_symbols_retrieved += scrape_ticker_symbols(OTCQX);
     }
     if (scan_pink) {
         new_symbols_retrieved += scrape_ticker_symbols(PINK);

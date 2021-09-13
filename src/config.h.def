@@ -1,5 +1,6 @@
 #pragma once
 
-#define DEBUG                    false
-#define USER_AGENT               "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0"
-#define RESOURCE_FINVIZ_SCAN_URL "https://finviz.com/screener.ashx?v=110&f=cap_smallunder,sh_price_u15"
+#define DEBUG                         false
+#define USER_AGENT                    "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0"
+#define RESOURCE_FINVIZ_SCAN_URL      "https://finviz.com/screener.ashx?v=110&f=cap_smallunder,sh_price_u15"
+#define RESOURCE_OTCMARKETS_MAX_PRICE 10

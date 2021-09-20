@@ -3,7 +3,7 @@
 CLI tool for scraping stock market ticker data
 
 #### Currently supported markets:
- - `NYSE`, `NASDAQ` (via [finviz.com](https://finviz.com/))
+ - `NYSE`, `NASDAQ` (via [finviz.com])
  - `OTCQX`, `OTCQB`, `Pink sheets` (via [otcmarkets.com](https://otcmarkets.com/))
 
 

@@ -337,7 +337,7 @@ void finviz_scrape_page(struct MemoryStruct *chunk, MarketPlace marketplace)
     // free(chunk->memory);
 }
 
-int ticker_scraper_scrape_finviz(MarketPlace marketplace)
+int ticker_scraper_scrape_finviz(const MarketPlace marketplace)
 {
     struct MemoryStruct chunk;
 

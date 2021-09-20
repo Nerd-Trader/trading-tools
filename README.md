@@ -27,3 +27,14 @@ or
 or
 
     bin/ticker-scraper OTC > otc-stocks.csv
+
+
+## Sample output
+
+```
+"marketplace","ticker","company","price","sector","industry","country","marketcap"
+"NASDAQ","A","Agilent Technologies, Inc.","173.94","Healthcare","Diagnostics & Research","USA","52.46B"
+"NASDAQ","AA","Alcoa Corporation","48.83","Basic Materials","Aluminum","USA","9.23B"
+"NASDAQ","AAAU","Goldman Sachs Physical Gold ETF","17.42","Financial","Exchange Traded Fund","USA","-"
+"NASDAQ","AAC","Ares Acquisition Corporation","9.74","Financial","Shell Companies","USA","1.22B"
+```

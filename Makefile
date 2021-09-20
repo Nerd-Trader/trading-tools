@@ -27,15 +27,15 @@ inc/config.h:
 
 bin/$(PROG_NAME): prepare config
 	$(CC) \
-                -I inc \
-		src/curl.c \
-		src/$(PROG_NAME).c \
-		src/data-sources/finviz.c \
-		src/data-sources/otcmarkets.c \
-		-lcsv \
-		-lcurl \
-		-ltidy \
-		-o bin/$(PROG_NAME)
+        -I inc \
+        src/curl.c \
+        src/$(PROG_NAME).c \
+        src/data-sources/finviz.c \
+        src/data-sources/otcmarkets.c \
+        -lcsv \
+        -lcurl \
+        -ltidy \
+        -o bin/$(PROG_NAME)
 
 run:
 	@bin/$(PROG_NAME)

@@ -13,7 +13,17 @@
 #include "data-sources/otcmarkets.h"
 #include "ticker-scraper.h"
 
-#define NUMBER_OF_CSV_COLUMNS 7
+static const char *csv_output_columns[] = {
+    "marketplace",
+    "ticker",
+    "company",
+    "price",
+    "sector",
+    "industry",
+    "country",
+    "marketcap",
+};
+static const int csv_output_column_count = sizeof(csv_output_columns) / sizeof(csv_output_columns[0]);
 
 void explicit_bzero(void *s, size_t n);
 
@@ -24,7 +34,7 @@ unsigned char csv_options = CSV_STRICT;
 void csv_cb_end_of_field(void *s, size_t i, void *outfile) {
     csv_fwrite((FILE *)outfile, s, i);
 
-    if (csv_field_index < NUMBER_OF_CSV_COLUMNS) { /* Do not put separator after last field */
+    if (csv_field_index + 1 < csv_output_column_count) { /* Do not put separator after last field */
         fputc(CSV_COMMA, (FILE *)outfile);
     }
 
@@ -84,40 +94,42 @@ char *escape_for_csv(const char *input)
 
 int ticker_scraper_add(DataRow *dataRow)
 {
+    const char delimeter[2] = { csv_get_delim(&parser), 0 };
+
     char *marketplace = marketplace_to_str(dataRow->marketplace);
     csv_parse(&parser, marketplace, strlen(marketplace), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    csv_parse(&parser, ",", 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+    csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     char *ticker = escape_for_csv(dataRow->ticker);
     csv_parse(&parser, ticker, strlen(ticker), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    csv_parse(&parser, ",", 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+    csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     char *company = escape_for_csv(dataRow->company);
     csv_parse(&parser, company, strlen(company), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    csv_parse(&parser, ",", 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+    csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     char *price = escape_for_csv(dataRow->price);
     csv_parse(&parser, price, strlen(price), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    csv_parse(&parser, ",", 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+    csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     char *sector = escape_for_csv(dataRow->sector);
     csv_parse(&parser, sector, strlen(sector), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    csv_parse(&parser, ",", 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+    csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     char *industry = escape_for_csv(dataRow->industry);
     csv_parse(&parser, industry, strlen(industry), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    csv_parse(&parser, ",", 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+    csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     char *country = escape_for_csv(dataRow->country);
     csv_parse(&parser, country, strlen(country), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    csv_parse(&parser, ",", 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+    csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     char *marketcap = escape_for_csv(dataRow->marketcap);
     csv_parse(&parser, marketcap, strlen(marketcap), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
@@ -216,7 +228,16 @@ int main(int argc, char **argv)
     }
     csv_set_delim(&parser, CSV_COMMA);
 
-    const char *csv_header = "marketplace,ticker,company,price,sector,industry,country,marketcap";
+    const int csv_header_mem_len = csv_output_column_count-1 + csv_output_column_count * sizeof(csv_output_columns[0]) + 1;
+    char csv_header[csv_header_mem_len];
+    explicit_bzero(csv_header, csv_header_mem_len);
+    for(int i = 0; i < csv_output_column_count; i++) {
+        const char delimeter[2] = { csv_get_delim(&parser), 0 };
+        if (i > 0) {
+            strcat(csv_header, delimeter);
+        }
+        strcat(csv_header, csv_output_columns[i]);
+    }
     csv_parse(&parser, csv_header, strlen(csv_header), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
     csv_fini(&parser, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 

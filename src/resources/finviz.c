@@ -216,8 +216,13 @@ int process_node(TidyDoc doc, TidyNode tnod, MarketPlace marketplace)
                             // Parse Price
                             {
                                 TidyNode a = tidyGetChild(td);
-                                TidyNode text = tidyGetChild(a);
-                                extract_text(doc, text, dataRow.price, sizeof(dataRow.price));
+                                TidyNode span = tidyGetChild(a);
+                                TidyNode text = tidyGetChild(span);
+                                if (text != NULL) {
+                                    extract_text(doc, text, dataRow.price, sizeof(dataRow.price));
+                                } else {
+                                    extract_text(doc, span, dataRow.price, sizeof(dataRow.price));
+                                }
                             }
 
                             new += ticker_scraper_add(&dataRow);

@@ -726,7 +726,7 @@ void otcmarkets_csv_cb_end_of_row(int c, void *outfile) {
 int otcmarkets_parse_data_from_csv(struct MemoryStruct *chunk, const MarketPlace marketplace, const char *industry[])
 {
     struct csv_parser parser;
-    unsigned char csv_options = CSV_STRICT;
+    static const unsigned char csv_options = CSV_STRICT;
     int new = 0;
 
     // TODO: reset otc_markets_data_row here

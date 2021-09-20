@@ -9,8 +9,10 @@
 
 #include "config.h"
 #include "curl.h"
-#include "ticker-scraper.h"
 #include "data-sources/otcmarkets.h"
+#include "ticker-scraper.h"
+
+#define OCTMARKETS_URL "https://www.otcmarkets.com/research/stock-screener/api/downloadCSV"
 
 void explicit_bzero(void *s, size_t n);
 
@@ -658,18 +660,18 @@ static const char *otcmarkets_industries[][2] = {
     { "X-ray apparatus and tubes", "3844" }
 };
 
-char otcmarkets_markets_otcqb[] = {
+static const char otcmarkets_markets_otcqb[] = {
     10 // OTCQB
 };
 
-char otcmarkets_markets_otcqx[] = {
+static const char otcmarkets_markets_otcqx[] = {
     6, // OTCQX International
     5, // OTCQX International Premier
     2, // UTCQX U.S.
     1  // UTCQX U.S. Premier
 };
 
-char otcmarkets_markets_pink[] = {
+static const char otcmarkets_markets_pink[] = {
     20, // Pink Current
     21, // Pink Limited
     22  // Pink No Information
@@ -762,7 +764,7 @@ int otcmarkets_retrieve_csv_file_for_industry(struct MemoryStruct *chunk, const 
     chunk->memory = malloc(1); /* Will be grown as needed by realloc() in nerd_trader_curl_write_memory_callback */
     chunk->size = 0; /* No data at this point */
 
-    char url[256] = "https://www.otcmarkets.com/research/stock-screener/api/downloadCSV";
+    char url[256] = OCTMARKETS_URL;
 
     int retrieved = 0;
 
@@ -779,8 +781,7 @@ int otcmarkets_retrieve_csv_file_for_industry(struct MemoryStruct *chunk, const 
         char markets[5] = { 0, 0, 0, 0, 0};
         char n[6] = "";
 
-        switch (marketplace)
-        {
+        switch (marketplace) {
             case OTCQX:
                 memcpy(markets, otcmarkets_markets_otcqx, sizeof(otcmarkets_markets_otcqx));
             break;

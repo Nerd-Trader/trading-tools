@@ -12,8 +12,8 @@ typedef unsigned long ulong; /* Needed by tidy/tidy.h */
 
 #include "config.h"
 #include "curl.h"
-#include "ticker-scraper.h"
 #include "data-sources/finviz.h"
+#include "ticker-scraper.h"
 
 #define FINVIZ_URL "https://finviz.com/screener.ashx?v=110"
 #define FINVIZ_PP  20 /* How many results per page finviz.com displays */

@@ -13,6 +13,8 @@
 #include "resources/otcmarkets.h"
 #include "ticker-scraper.h"
 
+#define NUMBER_OF_CSV_COLUMNS 7
+
 void explicit_bzero(void *s, size_t n);
 
 size_t csv_field_index = 0;
@@ -22,7 +24,7 @@ unsigned char csv_options = CSV_STRICT;
 void csv_cb_end_of_field(void *s, size_t i, void *outfile) {
     csv_fwrite((FILE *)outfile, s, i);
 
-    if (csv_field_index < 6) { /* Do not put separator after last field */
+    if (csv_field_index < NUMBER_OF_CSV_COLUMNS) { /* Do not put separator after last field */
         fputc(CSV_COMMA, (FILE *)outfile);
     }
 
@@ -97,6 +99,11 @@ int ticker_scraper_add(DataRow *dataRow)
 
     csv_parse(&parser, ",", 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
+    char *price = escape_for_csv(dataRow->price);
+    csv_parse(&parser, price, strlen(price), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+
+    csv_parse(&parser, ",", 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+
     char *sector = escape_for_csv(dataRow->sector);
     csv_parse(&parser, sector, strlen(sector), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
@@ -119,6 +126,7 @@ int ticker_scraper_add(DataRow *dataRow)
 
     free(ticker);
     free(company);
+    free(price);
     free(sector);
     free(industry);
     free(country);
@@ -208,7 +216,7 @@ int main(int argc, char **argv)
     }
     csv_set_delim(&parser, CSV_COMMA);
 
-    const char *csv_header = "marketplace,ticker,company,sector,industry,country,marketcap";
+    const char *csv_header = "marketplace,ticker,company,price,sector,industry,country,marketcap";
     csv_parse(&parser, csv_header, strlen(csv_header), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
     csv_fini(&parser, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 

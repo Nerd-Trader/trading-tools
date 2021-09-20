@@ -685,10 +685,10 @@ void otcmarkets_csv_cb_end_of_field(void *s, size_t i, void *outfile) {
 
     if (otcmarkets_csv_row_index > 0) {
         int field_value_len = i + 1;
-        char *string[field_value_len];
+        char string[field_value_len];
         explicit_bzero(string, sizeof(string));
-        memcpy(string, s, i);
-        string[field_value_len] = NULL;
+        memcpy(&string, s, i);
+        string[field_value_len] = '\0';
 
         switch (otcmarkets_csv_field_index) {
             case 0:
@@ -696,6 +696,9 @@ void otcmarkets_csv_cb_end_of_field(void *s, size_t i, void *outfile) {
                 break;
             case 1:
                 memcpy(otc_markets_data_row.company, string, field_value_len);
+                break;
+            case 3:
+                memcpy(otc_markets_data_row.price, string, field_value_len);
                 break;
             case 7:
                 memcpy(otc_markets_data_row.country, string, field_value_len);
@@ -809,13 +812,6 @@ int otcmarkets_retrieve_csv_file_for_industry(struct MemoryStruct *chunk, const 
                 break;
             }
         }
-    }
-
-    strcat(url, "&priceMax=");
-    {
-        char buf[4];
-        sprintf(buf, "%d", RESOURCE_OTCMARKETS_MAX_PRICE);
-        strcat(url, buf);
     }
 
     curl_easy_setopt(curl_handle, CURLOPT_URL, url);

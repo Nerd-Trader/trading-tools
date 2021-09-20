@@ -15,7 +15,8 @@ typedef unsigned long ulong; /* Needed by tidy/tidy.h */
 #include "../ticker-scraper.h"
 #include "finviz.h"
 
-#define FINVIZ_PP 20 /* How many results per page finviz.com displays */
+#define FINVIZ_URL "https://finviz.com/screener.ashx?v=110"
+#define FINVIZ_PP  20 /* How many results per page finviz.com displays */
 
 const char *html_entities[][2] = {
    { "&amp;",  "&" },
@@ -208,6 +209,16 @@ int process_node(TidyDoc doc, TidyNode tnod, MarketPlace marketplace)
                                 TidyNode text = tidyGetChild(a);
                                 extract_text(doc, text, dataRow.marketcap, sizeof(dataRow.marketcap));
                             }
+                            // Go to the next column
+                            td = tidyGetNext(td);
+                            // Go to the next column
+                            td = tidyGetNext(td);
+                            // Parse Price
+                            {
+                                TidyNode a = tidyGetChild(td);
+                                TidyNode text = tidyGetChild(a);
+                                extract_text(doc, text, dataRow.price, sizeof(dataRow.price));
+                            }
 
                             new += ticker_scraper_add(&dataRow);
                             total++;
@@ -272,8 +283,8 @@ void finviz_scrape_page(struct MemoryStruct *chunk, MarketPlace marketplace)
     chunk->size = 0; /* No data at this point */
 
     /* Specify the URL */
-    char url[strlen(RESOURCE_FINVIZ_SCAN_URL) + 10 + 3 + 11 + 1];
-    strncpy(url, RESOURCE_FINVIZ_SCAN_URL, sizeof(url) - 1);
+    char url[strlen(FINVIZ_URL) + 10 + 3 + 11 + 1];
+    strncpy(url, FINVIZ_URL, sizeof(url) - 1);
     url[sizeof(url) - 1] = '\0';
 
     switch (marketplace) {

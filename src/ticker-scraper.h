@@ -21,6 +21,7 @@ typedef struct DataRow {
     MarketPlace marketplace;
     Symbol ticker;
     char company[512];
+    char price[32];
     char sector[512];
     char industry[512];
     char country[512];

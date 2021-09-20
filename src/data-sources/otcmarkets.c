@@ -7,10 +7,10 @@
 #include <csv.h>
 #include <curl/curl.h>
 
-#include "../config.h"
-#include "../curl.h"
-#include "../ticker-scraper.h"
-#include "otcmarkets.h"
+#include "config.h"
+#include "curl.h"
+#include "ticker-scraper.h"
+#include "data-sources/otcmarkets.h"
 
 void explicit_bzero(void *s, size_t n);
 

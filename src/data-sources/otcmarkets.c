@@ -14,7 +14,7 @@
 
 void explicit_bzero(void *s, size_t n);
 
-const char *otcmarkets_industries[][2] = {
+static const char *otcmarkets_industries[][2] = {
     { "Abrasive, Asbestos & Misc Nonmetallic Mineral Prods", "3290" },
     { "Accident and health insurance", "6321" },
     { "Adhesives and sealants", "2891" },

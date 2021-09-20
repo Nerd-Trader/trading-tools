@@ -18,7 +18,7 @@ typedef unsigned long ulong; /* Needed by tidy/tidy.h */
 #define FINVIZ_URL "https://finviz.com/screener.ashx?v=110"
 #define FINVIZ_PP  20 /* How many results per page finviz.com displays */
 
-const char *html_entities[][2] = {
+static const char *html_entities[][2] = {
    { "&amp;",  "&" },
    { "&apos;", "'" },
    { "&gt;",   ">" },

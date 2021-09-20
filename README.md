@@ -14,8 +14,16 @@ Currently supported markets:
 
 ## How to run
 
-    bin/ticker-scraper > /tmp/tickers.csv
+    bin/ticker-scraper > us-stocks.csv
 
 or
 
-    bin/ticker-scraper NYSE NASDAQ OTCQX OTCQX Pink > /tmp/all-tickers.csv
+    bin/ticker-scraper NYSE NASDAQ OTCQX OTCQX Pink > us-and-otc-stocks.csv
+
+or
+
+    bin/ticker-scraper US > us-stocks.csv
+
+or
+
+    bin/ticker-scraper OTC > otc-stocks.csv

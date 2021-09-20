@@ -5,7 +5,6 @@
 
 #include "config.h"
 #include "curl.h"
-#include "ticker-scraper.h"
 
 size_t nerd_trader_curl_write_memory_callback(void *contents, size_t size,
                                      size_t nmemb, void* userp)

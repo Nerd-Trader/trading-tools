@@ -9,7 +9,7 @@ all: $(PROG_NAME)
 prepare: bin
 .PHONY: prepare
 
-config: src/config.h
+config: inc/config.h
 .PHONY: config
 
 $(PROG_NAME): bin/$(PROG_NAME)
@@ -22,15 +22,16 @@ clean:
 bin:
 	@mkdir -p bin
 
-src/config.h:
-	@cp src/config.h.def src/config.h
+inc/config.h:
+	@cp inc/config.h.def inc/config.h
 
 bin/$(PROG_NAME): prepare config
 	$(CC) \
+                -I inc \
 		src/curl.c \
 		src/$(PROG_NAME).c \
-		src/resources/finviz.c \
-		src/resources/otcmarkets.c \
+		src/data-sources/finviz.c \
+		src/data-sources/otcmarkets.c \
 		-lcsv \
 		-lcurl \
 		-ltidy \

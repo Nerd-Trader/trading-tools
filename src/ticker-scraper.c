@@ -9,8 +9,8 @@
 #include <csv.h>
 
 #include "config.h"
-#include "resources/finviz.h"
-#include "resources/otcmarkets.h"
+#include "data-sources/finviz.h"
+#include "data-sources/otcmarkets.h"
 #include "ticker-scraper.h"
 
 #define NUMBER_OF_CSV_COLUMNS 7

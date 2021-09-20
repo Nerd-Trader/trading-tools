@@ -12,7 +12,7 @@ Currently supported markets:
     make -j
 
 
-## How to run
+## How to use
 
     bin/ticker-scraper > us-stocks.csv
 

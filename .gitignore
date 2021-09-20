@@ -1,6 +1,6 @@
 .DS_Store
 
 bin/
-src/config.h
+inc/config.h
 
 *.csv

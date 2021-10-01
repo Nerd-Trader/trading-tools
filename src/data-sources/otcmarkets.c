@@ -678,32 +678,32 @@ static const char otcmarkets_markets_pink[] = {
 };
 
 CURL *curl_handle;
-int otcmarkets_csv_row_index = 0;
 int otcmarkets_csv_field_index = 0;
-DataRow otc_markets_data_row;
+int otcmarkets_csv_row_index = 0;
+DataRow otcmarkets_data_row;
 
-void otcmarkets_csv_cb_end_of_field(void *s, size_t i, void *outfile) {
+void otcmarkets_csv_cb_end_of_field(void *s, size_t l, void *outfile) {
     (void)(outfile); // Suppress "unused parameter" compiler warning
 
     if (otcmarkets_csv_row_index > 0) {
-        int field_value_len = i + 1;
+        int field_value_len = l + 1;
         char string[field_value_len];
         explicit_bzero(string, sizeof(string));
-        memcpy(&string, s, i);
+        memcpy(&string, s, l);
         string[field_value_len] = '\0';
 
         switch (otcmarkets_csv_field_index) {
             case 0:
-                memcpy(otc_markets_data_row.ticker, string, field_value_len);
+                memcpy(otcmarkets_data_row.ticker, string, field_value_len);
                 break;
             case 1:
-                memcpy(otc_markets_data_row.company, string, field_value_len);
+                memcpy(otcmarkets_data_row.company, string, field_value_len);
                 break;
             case 3:
-                memcpy(otc_markets_data_row.price, string, field_value_len);
+                memcpy(otcmarkets_data_row.price, string, field_value_len);
                 break;
             case 7:
-                memcpy(otc_markets_data_row.country, string, field_value_len);
+                memcpy(otcmarkets_data_row.country, string, field_value_len);
                 break;
         }
     }
@@ -716,7 +716,7 @@ void otcmarkets_csv_cb_end_of_row(int c, void *outfile) {
     (void)(outfile); // Suppress "unused parameter" compiler warning
 
     if (otcmarkets_csv_row_index > 0) {
-        ticker_scraper_add(&otc_markets_data_row);
+        ticker_scraper_add(&otcmarkets_data_row);
     }
 
     otcmarkets_csv_field_index = 0;
@@ -729,18 +729,18 @@ int otcmarkets_parse_data_from_csv(struct MemoryStruct *chunk, const MarketPlace
     static const unsigned char csv_options = CSV_STRICT;
     int new = 0;
 
-    // TODO: reset otc_markets_data_row here
+    // TODO: reset otcmarkets_data_row here
 
 #if DEBUG
     fprintf(stderr, "Parsing CSV file for industry %s of marketplace %s\n", industry[0], marketplace_to_str(marketplace));
 #endif
 
-    otc_markets_data_row.marketplace = marketplace;
+    otcmarkets_data_row.marketplace = marketplace;
 
-    strncpy(otc_markets_data_row.industry, industry[0], sizeof(otc_markets_data_row.industry) - 1);
+    strncpy(otcmarkets_data_row.industry, industry[0], sizeof(otcmarkets_data_row.industry) - 1);
 
     /* Sector data is not provided by otcmarkets.com */
-    explicit_bzero(otc_markets_data_row.sector, sizeof(otc_markets_data_row.sector));
+    explicit_bzero(otcmarkets_data_row.sector, sizeof(otcmarkets_data_row.sector));
 
     if (csv_init(&parser, csv_options) != 0) {
         fprintf(stderr, "Error: Couldn’t initialize CSV parser\n");

@@ -13,6 +13,8 @@
 #include "data-sources/otcmarkets.h"
 #include "ticker-scraper.h"
 
+void explicit_bzero(void *s, size_t n);
+
 static const char *csv_output_columns[] = {
     "marketplace",
     "ticker",
@@ -25,17 +27,15 @@ static const char *csv_output_columns[] = {
 };
 static const int csv_output_column_count = sizeof(csv_output_columns) / sizeof(csv_output_columns[0]);
 
-void explicit_bzero(void *s, size_t n);
-
-size_t csv_field_index = 0;
-struct csv_parser parser;
-unsigned char csv_options = CSV_STRICT;
+static bool is_allowed_to_output_csv_header = true;
+static size_t csv_field_index = 0;
+static struct csv_parser parser;
 
 void csv_cb_end_of_field(void *s, size_t i, void *outfile) {
     csv_fwrite((FILE *)outfile, s, i);
 
     if (csv_field_index + 1 < csv_output_column_count) { /* Do not put separator after last field */
-        fputc(CSV_COMMA, (FILE *)outfile);
+        fputc(csv_get_delim(&parser), (FILE *)outfile);
     }
 
     csv_field_index++;
@@ -49,7 +49,7 @@ void csv_cb_end_of_row(int c, void *outfile) {
     csv_field_index = 0;
 }
 
-char *marketplace_to_str(MarketPlace marketplace)
+char *marketplace_to_str(const MarketPlace marketplace)
 {
     switch (marketplace)
     {
@@ -75,7 +75,8 @@ char *marketplace_to_str(MarketPlace marketplace)
         break;
 
         default:
-            return "ERROR";
+        case UNKNOWN:
+            return "Unknown";
     }
 }
 
@@ -92,46 +93,46 @@ char *escape_for_csv(const char *input)
     return temp;
 }
 
-int ticker_scraper_add(DataRow *dataRow)
+int ticker_scraper_add(const DataRow *data_row)
 {
     const char delimeter[2] = { csv_get_delim(&parser), 0 };
 
-    char *marketplace = marketplace_to_str(dataRow->marketplace);
+    char *marketplace = marketplace_to_str(data_row->marketplace);
     csv_parse(&parser, marketplace, strlen(marketplace), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    char *ticker = escape_for_csv(dataRow->ticker);
+    char *ticker = escape_for_csv(data_row->ticker);
     csv_parse(&parser, ticker, strlen(ticker), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    char *company = escape_for_csv(dataRow->company);
+    char *company = escape_for_csv(data_row->company);
     csv_parse(&parser, company, strlen(company), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    char *price = escape_for_csv(dataRow->price);
+    char *price = escape_for_csv(data_row->price);
     csv_parse(&parser, price, strlen(price), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    char *sector = escape_for_csv(dataRow->sector);
+    char *sector = escape_for_csv(data_row->sector);
     csv_parse(&parser, sector, strlen(sector), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    char *industry = escape_for_csv(dataRow->industry);
+    char *industry = escape_for_csv(data_row->industry);
     csv_parse(&parser, industry, strlen(industry), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    char *country = escape_for_csv(dataRow->country);
+    char *country = escape_for_csv(data_row->country);
     csv_parse(&parser, country, strlen(country), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     csv_parse(&parser, delimeter, 1, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
-    char *marketcap = escape_for_csv(dataRow->marketcap);
+    char *marketcap = escape_for_csv(data_row->marketcap);
     csv_parse(&parser, marketcap, strlen(marketcap), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     csv_fini(&parser, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
@@ -147,20 +148,17 @@ int ticker_scraper_add(DataRow *dataRow)
     return 1;
 }
 
-int scrape_ticker_symbols(MarketPlace marketplace)
+int scrape_ticker_symbols(const MarketPlace marketplace)
 {
     int new = 0;
 
-    switch (marketplace)
-    {
+    switch (marketplace) {
         case AMEX:
             // Just a placeholder, no point in letting it being scraped separately from NYSE
             break;
         case NYSE:
         case NASDAQ:
-#if DEBUG
             fprintf(stderr, "Scraping %s tickers…\n", marketplace_to_str(marketplace));
-#endif
             new = ticker_scraper_scrape_finviz(marketplace);
             if (marketplace == NYSE) {
                 // Finviz requires NYSE American to be scraped separately, as legacy "AMEX"
@@ -168,97 +166,111 @@ int scrape_ticker_symbols(MarketPlace marketplace)
             }
         break;
 
-        case OTCQX:
         case OTCQB:
+        case OTCQX:
         case PINK:
-#if DEBUG
             fprintf(stderr, "Scraping %s tickers…\n", marketplace_to_str(marketplace));
-#endif
             new = ticker_scraper_scrape_otcmarkets(marketplace);
         break;
+
+        default:
+        case UNKNOWN:
+            fprintf(stderr, "Error: Unknown marketplace\n");
     }
 
     return new;
 }
 
-int main(int argc, char **argv)
+int main(const int argc, const char **argv)
 {
     unsigned int new_symbols_retrieved = 0;
-    bool no_params_provided = argc < 2;
-    bool scan_nasdaq = false,
-         scan_nyse = false,
-         scan_otcqb = false,
-         scan_otcqx = false,
-         scan_pink = false;
+    bool marketplace_params_provided = false;
+    bool scrape_nasdaq = false,
+         scrape_nyse = false,
+         scrape_otcqb = false,
+         scrape_otcqx = false,
+         scrape_pink = false;
 
-    if (no_params_provided) {
-        scan_nasdaq = true;
-        scan_nyse = true;
-    } else {
-        for (int i = 1; i < argc; i++) {
-            if (0 == strcmp(argv[i], "NASDAQ")) {
-                scan_nasdaq = true;
-            } else if (0 == strcmp(argv[i], "NYSE")) {
-                scan_nyse = true;
-            } else if (0 == strcmp(argv[i], "OTCQB")) {
-                scan_otcqb = true;
-            } else if (0 == strcmp(argv[i], "OTCQX")) {
-                scan_otcqx = true;
-            } else if (0 == strcmp(argv[i], "Pink")) {
-                scan_pink = true;
-            } else if (0 == strcmp(argv[i], "US")) {
-                scan_nasdaq = true;
-                scan_nyse = true;
-            } else if (0 == strcmp(argv[i], "OTC")) {
-                scan_otcqb = true;
-                scan_otcqx = true;
-                scan_pink = true;
-            }
-        }
-
-        if (!scan_nasdaq && !scan_nyse && !scan_otcqb && !scan_otcqx && !scan_pink) {
-            fprintf(stderr, "No correct marketplace parameters provided\n");
+    for (int i = 1; i < argc; i++) {
+        if (0 == strcmp(argv[i], "--no-csv-header")) {
+            is_allowed_to_output_csv_header = false;
+        } else if (0 == strcmp(argv[i], "NASDAQ")) {
+            scrape_nasdaq = true;
+            marketplace_params_provided = true;
+        } else if (0 == strcmp(argv[i], "NYSE")) {
+            scrape_nyse = true;
+            marketplace_params_provided = true;
+        } else if (0 == strcmp(argv[i], "OTCQB")) {
+            scrape_otcqb = true;
+            marketplace_params_provided = true;
+        } else if (0 == strcmp(argv[i], "OTCQX")) {
+            scrape_otcqx = true;
+            marketplace_params_provided = true;
+        } else if (0 == strcmp(argv[i], "Pink")) {
+            scrape_pink = true;
+            marketplace_params_provided = true;
+        } else if (0 == strcmp(argv[i], "US")) {
+            scrape_nasdaq = true;
+            scrape_nyse = true;
+            marketplace_params_provided = true;
+        } else if (0 == strcmp(argv[i], "OTC")) {
+            scrape_otcqb = true;
+            scrape_otcqx = true;
+            scrape_pink = true;
+            marketplace_params_provided = true;
+        } else {
+            fprintf(stderr, "Error: Unrecognized parameter %s\n", argv[i]);
             exit(EXIT_FAILURE);
         }
     }
 
-    if (csv_init(&parser, csv_options) != 0) {
+    if (!marketplace_params_provided) {
+        // Scrape only US stocks by default
+        scrape_nasdaq = true;
+        scrape_nyse = true;
+    }
+
+    if (csv_init(&parser, CSV_STRICT) != 0) {
         fprintf(stderr, "Error: Couldn’t initialize CSV parser\n");
         exit(EXIT_FAILURE);
     }
+
     csv_set_delim(&parser, CSV_COMMA);
 
-    const int csv_header_mem_len = csv_output_column_count-1 + csv_output_column_count * sizeof(csv_output_columns[0]) + 1;
-    char csv_header[csv_header_mem_len];
-    explicit_bzero(csv_header, csv_header_mem_len);
-    for(int i = 0; i < csv_output_column_count; i++) {
-        const char delimeter[2] = { csv_get_delim(&parser), 0 };
-        if (i > 0) {
-            strcat(csv_header, delimeter);
+    if (is_allowed_to_output_csv_header) {
+        const int csv_header_mem_len = csv_output_column_count-1 + csv_output_column_count * sizeof(csv_output_columns[0]) + 1;
+        char csv_header[csv_header_mem_len];
+        explicit_bzero(csv_header, csv_header_mem_len);
+        for(int i = 0; i < csv_output_column_count; i++) {
+            const char delimeter[2] = { csv_get_delim(&parser), 0 };
+            if (i > 0) {
+                strcat(csv_header, delimeter);
+            }
+            strcat(csv_header, csv_output_columns[i]);
         }
-        strcat(csv_header, csv_output_columns[i]);
+        csv_parse(&parser, csv_header, strlen(csv_header), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
     }
-    csv_parse(&parser, csv_header, strlen(csv_header), csv_cb_end_of_field, csv_cb_end_of_row, stdout);
+
     csv_fini(&parser, csv_cb_end_of_field, csv_cb_end_of_row, stdout);
 
     new_symbols_retrieved = 0;
 
     // US
-    if (scan_nasdaq) {
+    if (scrape_nasdaq) {
         new_symbols_retrieved += scrape_ticker_symbols(NASDAQ);
     }
-    if (scan_nyse) {
+    if (scrape_nyse) {
         new_symbols_retrieved += scrape_ticker_symbols(NYSE);
     }
 
     // OTC
-    if (scan_otcqb) {
+    if (scrape_otcqb) {
         new_symbols_retrieved += scrape_ticker_symbols(OTCQB);
     }
-    if (scan_otcqx) {
+    if (scrape_otcqx) {
         new_symbols_retrieved += scrape_ticker_symbols(OTCQX);
     }
-    if (scan_pink) {
+    if (scrape_pink) {
         new_symbols_retrieved += scrape_ticker_symbols(PINK);
     }
 

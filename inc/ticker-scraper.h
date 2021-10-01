@@ -5,31 +5,31 @@
 
 typedef char bool;
 
-typedef enum MarketPlaces
-{
-    AMEX   = (1 << 0),
-    NYSE   = (1 << 1),
-    NASDAQ = (1 << 2),
-    OTCQX  = (1 << 3),
-    OTCQB  = (1 << 4),
-    PINK   = (1 << 5)
-} MarketPlace;
-
 typedef char Symbol[7];
 
+typedef enum MarketPlaces {
+    UNKNOWN = 1 << 0,
+    AMEX    = 1 << 1,
+    NYSE    = 1 << 2,
+    NASDAQ  = 1 << 3,
+    OTCQX   = 1 << 4,
+    OTCQB   = 1 << 5,
+    PINK    = 1 << 6,
+} MarketPlace;
+
 typedef struct DataRow {
+    Symbol      ticker;
     MarketPlace marketplace;
-    Symbol ticker;
-    char company[512];
-    char price[32];
-    char sector[512];
-    char industry[512];
-    char country[512];
-    char marketcap[512];
+    char        company[512];
+    char        price[32];
+    char        sector[512];
+    char        industry[512];
+    char        country[512];
+    char        marketcap[512];
 } DataRow;
 
 char *escape_for_csv(const char *input);
-char *marketplace_to_str(MarketPlace marketplace);
+char *marketplace_to_str(const MarketPlace marketplace);
 
-int scrape_ticker_symbols(MarketPlace marketplace);
-int ticker_scraper_add(DataRow *dataRow);
+int scrape_ticker_symbols(const MarketPlace marketplace);
+int ticker_scraper_add(const DataRow *dataRow);

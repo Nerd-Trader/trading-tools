@@ -782,15 +782,15 @@ int otcmarkets_retrieve_csv_file_for_industry(struct MemoryStruct *chunk, const 
         char n[6] = "";
 
         switch (marketplace) {
-            case OTCQX:
+            case MPLACE_OTCQX:
                 memcpy(markets, otcmarkets_markets_otcqx, sizeof(otcmarkets_markets_otcqx));
             break;
 
-            case OTCQB:
+            case MPLACE_OTCQB:
                 memcpy(markets, otcmarkets_markets_otcqb, sizeof(otcmarkets_markets_otcqb));
             break;
 
-            case PINK:
+            case MPLACE_PINK:
                 memcpy(markets, otcmarkets_markets_pink, sizeof(otcmarkets_markets_pink));
             break;
 

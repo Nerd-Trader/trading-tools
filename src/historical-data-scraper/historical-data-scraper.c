@@ -124,19 +124,19 @@ void csv_cb_end_of_row(int c, void *outfile)
 
 MarketPlace str_to_marketplace(const char *mplace_str)
 {
-    if (strcmp(mplace_str, "NASDAQ") == 0) {
-        return NASDAQ;
-    } else if (strcmp(mplace_str, "NYSE") == 0) {
-        return NYSE;
-    } else if (strcmp(mplace_str, "OTCQB") == 0) {
-        return OTCQB;
-    } else if (strcmp(mplace_str, "OTCQX") == 0) {
-        return OTCQX;
-    } else if (strcmp(mplace_str, "Pink") == 0) {
-        return PINK;
+    if (strcmp(mplace_str, MPLACE_NASDAQ_STR) == 0) {
+        return MPLACE_NASDAQ;
+    } else if (strcmp(mplace_str, MPLACE_NYSE_STR) == 0) {
+        return MPLACE_NYSE;
+    } else if (strcmp(mplace_str, MPLACE_OTCQB_STR) == 0) {
+        return MPLACE_OTCQB;
+    } else if (strcmp(mplace_str, MPLACE_OTCQX_STR) == 0) {
+        return MPLACE_OTCQX;
+    } else if (strcmp(mplace_str, MPLACE_PINK_STR) == 0) {
+        return MPLACE_PINK;
     }
 
-    return UNKNOWN;
+    return MPLACE_UNKNOWN;
 }
 
 int main(const int argc, const char **argv)

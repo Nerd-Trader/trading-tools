@@ -9,12 +9,19 @@ typedef char bool;
 typedef char Symbol[32];
 
 typedef enum MarketPlaces {
-    UNKNOWN = 1 << 0,
+    MPLACE_UNKNOWN = 1 << 0,
     // US
-    NASDAQ  = 1 << 1,
-    NYSE    = 1 << 2,
+    MPLACE_NASDAQ  = 1 << 1,
+    MPLACE_NYSE    = 1 << 2,
     // OTC
-    OTCQB   = 1 << 3,
-    OTCQX   = 1 << 4,
-    PINK    = 1 << 5,
+    MPLACE_OTCQB   = 1 << 3,
+    MPLACE_OTCQX   = 1 << 4,
+    MPLACE_PINK    = 1 << 5,
 } MarketPlace;
+
+#define MPLACE_UNKNOWN_STR "Unknown"
+#define MPLACE_NASDAQ_STR  "NASDAQ"
+#define MPLACE_NYSE_STR    "NYSE"
+#define MPLACE_OTCQB_STR   "OTCQB"
+#define MPLACE_OTCQX_STR   "OTCQX"
+#define MPLACE_PINK_STR    "Pink"

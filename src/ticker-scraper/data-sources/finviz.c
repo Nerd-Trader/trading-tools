@@ -371,12 +371,12 @@ int ticker_scraper_scrape_finviz(const MarketPlace marketplace)
 {
     int item_count = 0;
 
-    if (marketplace == NASDAQ) {
-        item_count += ticker_scraper_scrape_finviz_internal(FINVIZ_MPLACE_NASDAQ, NASDAQ);
-    } else if (marketplace == NYSE) {
-        item_count += ticker_scraper_scrape_finviz_internal(FINVIZ_MPLACE_NYSE, NYSE);
+    if (marketplace == MPLACE_NASDAQ) {
+        item_count += ticker_scraper_scrape_finviz_internal(FINVIZ_MPLACE_NASDAQ, MPLACE_NASDAQ);
+    } else if (marketplace == MPLACE_NYSE) {
+        item_count += ticker_scraper_scrape_finviz_internal(FINVIZ_MPLACE_NYSE, MPLACE_NYSE);
         // Finviz requires NYSE American to be scraped separately, as legacy "AMEX"
-        item_count += ticker_scraper_scrape_finviz_internal(FINVIZ_MPLACE_AMEX, NYSE);
+        item_count += ticker_scraper_scrape_finviz_internal(FINVIZ_MPLACE_AMEX, MPLACE_NYSE);
     } else {
         fprintf(stderr, "FINVIZ does not provide data for given marketplace\n");
     }

@@ -54,11 +54,11 @@ inc/config.h:
 	@cp inc/config.h.def inc/config.h
 
 run-$(TOOL_NAME_1): data
-	bin/$(TOOL_NAME_1) US OTC > data/tickers.csv
+	@bin/$(TOOL_NAME_1) US OTC > data/tickers.csv
 .PHONY: run-$(TOOL_NAME_1)
 
 run-$(TOOL_NAME_2): data
-	bin/$(TOOL_NAME_2) data/tickers.csv -o data/historical/
+	@bin/$(TOOL_NAME_2) data/tickers.csv -o data/historical/
 .PHONY: run-$(TOOL_NAME_2)
 
 run: run-$(TOOL_NAME_1) run-$(TOOL_NAME_2)

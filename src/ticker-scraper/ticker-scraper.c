@@ -53,29 +53,29 @@ char *marketplace_to_str(const MarketPlace marketplace)
 {
     switch (marketplace)
     {
-        case NASDAQ:
-            return "NASDAQ";
+        case MPLACE_NASDAQ:
+            return MPLACE_NASDAQ_STR;
         break;
 
-        case NYSE:
-            return "NYSE";
+        case MPLACE_NYSE:
+            return MPLACE_NYSE_STR;
         break;
 
-        case OTCQB:
-            return "OTCQB";
+        case MPLACE_OTCQB:
+            return MPLACE_OTCQB_STR;
         break;
 
-        case OTCQX:
-            return "OTCQX";
+        case MPLACE_OTCQX:
+            return MPLACE_OTCQX_STR;
         break;
 
-        case PINK:
-            return "Pink";
+        case MPLACE_PINK:
+            return MPLACE_PINK_STR;
         break;
 
         default:
-        case UNKNOWN:
-            return "Unknown";
+        case MPLACE_UNKNOWN:
+            return MPLACE_UNKNOWN_STR;
     }
 }
 
@@ -152,21 +152,21 @@ int scrape_ticker_symbols(const MarketPlace marketplace)
     int new = 0;
 
     switch (marketplace) {
-        case NYSE:
-        case NASDAQ:
+        case MPLACE_NYSE:
+        case MPLACE_NASDAQ:
             fprintf(stderr, "Scraping %s tickers from %s…\n", marketplace_to_str(marketplace), "FINVIZ");
             new = ticker_scraper_scrape_finviz(marketplace);
         break;
 
-        case OTCQB:
-        case OTCQX:
-        case PINK:
+        case MPLACE_OTCQB:
+        case MPLACE_OTCQX:
+        case MPLACE_PINK:
             fprintf(stderr, "Scraping %s tickers from %s…\n", marketplace_to_str(marketplace), "OTC Markets");
             new = ticker_scraper_scrape_otcmarkets(marketplace);
         break;
 
         default:
-        case UNKNOWN:
+        case MPLACE_UNKNOWN:
             fprintf(stderr, "Error: Unknown marketplace\n");
     }
 
@@ -249,21 +249,21 @@ int main(const int argc, const char **argv)
 
     // US
     if (scrape_nasdaq) {
-        new_symbols_retrieved += scrape_ticker_symbols(NASDAQ);
+        new_symbols_retrieved += scrape_ticker_symbols(MPLACE_NASDAQ);
     }
     if (scrape_nyse) {
-        new_symbols_retrieved += scrape_ticker_symbols(NYSE);
+        new_symbols_retrieved += scrape_ticker_symbols(MPLACE_NYSE);
     }
 
     // OTC
     if (scrape_otcqb) {
-        new_symbols_retrieved += scrape_ticker_symbols(OTCQB);
+        new_symbols_retrieved += scrape_ticker_symbols(MPLACE_OTCQB);
     }
     if (scrape_otcqx) {
-        new_symbols_retrieved += scrape_ticker_symbols(OTCQX);
+        new_symbols_retrieved += scrape_ticker_symbols(MPLACE_OTCQX);
     }
     if (scrape_pink) {
-        new_symbols_retrieved += scrape_ticker_symbols(PINK);
+        new_symbols_retrieved += scrape_ticker_symbols(MPLACE_PINK);
     }
 
     csv_free(&parser);

@@ -1,23 +1,39 @@
-# ticker-scraper
+# trading-tools
 
-CLI tool for scraping stock market ticker data
+A whole bunch of programs, for fun and profit.
 
-#### Currently supported markets:
+Some tools require access to gatewayed APIs. Credentials should be added to `inc/config.h` after running `make config` (and inspecting the source code of this whole codebase, of course).
+
+
+------------------------------------------------------------------------------
+
+## Tool 1: ticker-scraper
+
+This CLI tool is capable of scraping general stock market ticker data from various web resources.  It generates CSV files that can later be used by other tools in the suite.
+
+
+### Currently supported markets:
  - `NYSE`, `NASDAQ` (via [finviz.com](https://finviz.com))
  - `OTCQB`, `OTCQX`, `Pink sheets` (via [otcmarkets.com](https://otcmarkets.com))
 
 
-## How to build
+### Dependencies
+
+`libcsv`, `libcurl`, `libtidy`
+
+
+### How to build
 
 ```console
-make -j
+make -j ticker-scraper
 ```
 
 
-## How to run
+### How to run
 
 ```console
-bin/ticker-scraper --no-csv-header > us-stocks.csv
+bin/ticker-scraper NASDAQ > nasdaq-and-pink.csv
+bin/ticker-scraper --no-csv-header Pink >> nasdaq-and-pink.csv
 ```
 
 or
@@ -27,7 +43,7 @@ bin/ticker-scraper US OTC > us-and-otc-stocks.csv
 ```
 
 
-## Sample output
+### Sample output
 
 ```
 "marketplace","ticker","company","price","sector","industry","country","marketcap"
@@ -36,3 +52,5 @@ bin/ticker-scraper US OTC > us-and-otc-stocks.csv
 "NASDAQ","AAAU","Goldman Sachs Physical Gold ETF","17.42","Financial","Exchange Traded Fund","USA","-"
 "NASDAQ","AAC","Ares Acquisition Corporation","9.74","Financial","Shell Companies","USA","1.22B"
 ```
+
+------------------------------------------------------------------------------

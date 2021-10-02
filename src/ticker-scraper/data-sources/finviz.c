@@ -15,8 +15,8 @@ typedef unsigned long ulong; /* Needed by tidy/tidy.h */
 #include "data-sources/finviz.h"
 #include "ticker-scraper.h"
 
-#define FINVIZ_URL "https://finviz.com/screener.ashx?v=110"
 #define FINVIZ_PP  20 /* How many results per page finviz.com displays */
+#define FINVIZ_URL "https://finviz.com/screener.ashx?v=110" /* Base URL */
 
 static const char *html_entities[][2] = {
    { "&amp;",  "&" },
@@ -280,7 +280,7 @@ int finviz_parse_page_extract_symbols(struct MemoryStruct *chunk, MarketPlace ma
     return t;
 }
 
-void finviz_scrape_page(struct MemoryStruct *chunk, MarketPlace marketplace)
+void finviz_scrape_page(struct MemoryStruct *chunk, const MarketPlace marketplace)
 {
     CURLcode res;
 
@@ -294,15 +294,15 @@ void finviz_scrape_page(struct MemoryStruct *chunk, MarketPlace marketplace)
 
     switch (marketplace) {
         case AMEX:
-            strncat(url, ",exch_amex", sizeof(url) - 1 - strlen(url));
+            strncat(url, "&f=exch_amex", sizeof(url) - 1 - strlen(url));
         break;
 
         case NYSE:
-            strncat(url, ",exch_nyse", sizeof(url) - 1 - strlen(url));
+            strncat(url, "&f=exch_nyse", sizeof(url) - 1 - strlen(url));
         break;
 
         case NASDAQ:
-            strncat(url, ",exch_nasd", sizeof(url) - 1 - strlen(url));
+            strncat(url, "&f=exch_nasd", sizeof(url) - 1 - strlen(url));
         break;
 
         default:
@@ -321,16 +321,12 @@ void finviz_scrape_page(struct MemoryStruct *chunk, MarketPlace marketplace)
     /* Get it! */
     res = curl_easy_perform(curl_handle);
 
-#if DEBUG
-    fprintf(stderr, "Scraping page %d: %s\n", page, url);
-#endif
-
     /* Check for errors */
     if (res != CURLE_OK) {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n",
-                        curl_easy_strerror(res));
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
     } else {
         int t = finviz_parse_page_extract_symbols(chunk, marketplace);
+        fprintf(stderr, "Scraped %s tickers from FINVIZ page %d [%s]\n", marketplace_to_str(marketplace), page, url);
         page = (page * FINVIZ_PP < t) ? page + 1 : -1;
     }
 

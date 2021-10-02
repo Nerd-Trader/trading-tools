@@ -1,41 +1,46 @@
-PROG_NAME = ticker-scraper
+TOOL_NAME_1 = ticker-scraper
 
 CFLAGS = -std=c99 -s -pedantic -Wall -Wextra -Wfatal-errors -pedantic-errors -D_XOPEN_SOURCE=500 -D_POSIX_C_SOURCE=200809L -O3
 CC     = cc $(CFLAGS)
 
-all: $(PROG_NAME)
+all: $(TOOL_NAME_1)
 .PHONY: all
 
-prepare: bin
-.PHONY: prepare
+bin:
+	@mkdir -p bin
 
-config: inc/config.h
-.PHONY: config
+$(TOOL_NAME_1): bin/$(TOOL_NAME_1)
+.PHONY: $(TOOL_NAME_1)
 
-$(PROG_NAME): bin/$(PROG_NAME)
-.PHONY: $(PROG_NAME)
+bin/$(TOOL_NAME_1): bin config
+	$(CC) \
+        -I inc \
+        -I inc/$(TOOL_NAME_1) \
+        src/curl.c \
+        src/$(TOOL_NAME_1)/$(TOOL_NAME_1).c \
+        src/$(TOOL_NAME_1)/data-sources/finviz.c \
+        src/$(TOOL_NAME_1)/data-sources/otcmarkets.c \
+        -lcsv \
+        -lcurl \
+        -ltidy \
+        -o bin/$(TOOL_NAME_1)
 
 clean:
 	@rm -rf bin
 .PHONY: clean
 
-bin:
-	@mkdir -p bin
+config: inc/config.h
+.PHONY: config
+
+data:
+	@mkdir -p data
 
 inc/config.h:
 	@cp inc/config.h.def inc/config.h
 
-bin/$(PROG_NAME): prepare config
-	$(CC) \
-        -I inc \
-        src/curl.c \
-        src/$(PROG_NAME).c \
-        src/data-sources/finviz.c \
-        src/data-sources/otcmarkets.c \
-        -lcsv \
-        -lcurl \
-        -ltidy \
-        -o bin/$(PROG_NAME)
+run-$(TOOL_NAME_1): data
+	bin/$(TOOL_NAME_1) US OTC > data/tickers.csv
+.PHONY: run-$(TOOL_NAME_1)
 
-run:
-	@bin/$(PROG_NAME)
+run: run-$(TOOL_NAME_1)
+.PHONY: run

@@ -158,7 +158,7 @@ int scrape_ticker_symbols(const MarketPlace marketplace)
             break;
         case NYSE:
         case NASDAQ:
-            fprintf(stderr, "Scraping %s tickers…\n", marketplace_to_str(marketplace));
+            fprintf(stderr, "Scraping %s tickers from %s…\n", marketplace_to_str(marketplace), "FINVIZ");
             new = ticker_scraper_scrape_finviz(marketplace);
             if (marketplace == NYSE) {
                 // Finviz requires NYSE American to be scraped separately, as legacy "AMEX"
@@ -169,7 +169,7 @@ int scrape_ticker_symbols(const MarketPlace marketplace)
         case OTCQB:
         case OTCQX:
         case PINK:
-            fprintf(stderr, "Scraping %s tickers…\n", marketplace_to_str(marketplace));
+            fprintf(stderr, "Scraping %s tickers from %s…\n", marketplace_to_str(marketplace), "OTC Markets");
             new = ticker_scraper_scrape_otcmarkets(marketplace);
         break;
 

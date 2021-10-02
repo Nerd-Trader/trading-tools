@@ -817,10 +817,6 @@ int otcmarkets_retrieve_csv_file_for_industry(struct MemoryStruct *chunk, const 
 
     curl_easy_setopt(curl_handle, CURLOPT_URL, url);
 
-#if DEBUG
-    fprintf(stderr, "Attempting to obtain CSV file for industry \"%s\" of marketplace %s: %s\n", industry[0], marketplace_to_str(marketplace), url);
-#endif
-
     /* Get it! */
     res = curl_easy_perform(curl_handle);
 
@@ -829,6 +825,7 @@ int otcmarkets_retrieve_csv_file_for_industry(struct MemoryStruct *chunk, const 
         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
     } else {
         retrieved = otcmarkets_parse_data_from_csv(chunk, marketplace, industry);
+        fprintf(stderr, "Scraped %s tickers for industry “%s” [%s]\n", marketplace_to_str(marketplace), industry[0], url);
     }
 
     return retrieved;

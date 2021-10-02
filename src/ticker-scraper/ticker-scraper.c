@@ -58,7 +58,6 @@ char *marketplace_to_str(const MarketPlace marketplace)
         break;
 
         case NYSE:
-        case AMEX:
             return "NYSE";
         break;
 
@@ -153,17 +152,10 @@ int scrape_ticker_symbols(const MarketPlace marketplace)
     int new = 0;
 
     switch (marketplace) {
-        case AMEX:
-            // Just a placeholder, no point in letting it being scraped separately from NYSE
-            break;
         case NYSE:
         case NASDAQ:
             fprintf(stderr, "Scraping %s tickers from %s…\n", marketplace_to_str(marketplace), "FINVIZ");
             new = ticker_scraper_scrape_finviz(marketplace);
-            if (marketplace == NYSE) {
-                // Finviz requires NYSE American to be scraped separately, as legacy "AMEX"
-                new += ticker_scraper_scrape_finviz(AMEX);
-            }
         break;
 
         case OTCQB:

@@ -1,20 +1,6 @@
 #pragma once
 
-#define true  1
-#define false 0
-
-typedef char bool;
-
-typedef char Symbol[7];
-
-typedef enum MarketPlaces {
-    UNKNOWN = 1 << 0,
-    NASDAQ  = 1 << 1,
-    NYSE    = 1 << 2,
-    OTCQB   = 1 << 3,
-    OTCQX   = 1 << 4,
-    PINK    = 1 << 5,
-} MarketPlace;
+#include "common.h"
 
 typedef struct DataRow {
     Symbol      ticker;

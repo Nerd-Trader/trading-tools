@@ -18,7 +18,13 @@ typedef unsigned long ulong; /* Needed by tidy/tidy.h */
 #define FINVIZ_PP  20 /* How many results per page finviz.com displays */
 #define FINVIZ_URL "https://finviz.com/screener.ashx?v=110" /* Base URL */
 
-static const char *html_entities[][2] = {
+typedef enum FINVIZ_MarketPlaces {
+    FINVIZ_MPLACE_AMEX   = 1 << 0, // Legacy
+    FINVIZ_MPLACE_NASDAQ = 1 << 1,
+    FINVIZ_MPLACE_NYSE   = 1 << 2,
+} FINVIZ_MarketPlace;
+
+const char *html_entities[][2] = {
    { "&amp;",  "&" },
    { "&apos;", "'" },
    { "&gt;",   ">" },
@@ -92,15 +98,15 @@ static void sanitize_entities(const char *data, char *str, const size_t len)
    strncpy(str, sanitized_data, len);
 }
 
-void extract_text(TidyDoc doc, TidyNode tnod, char *destination, ulong max_size)
+void extract_text(const TidyDoc doc, const TidyNode tnod, char *destination, const ulong max_size)
 {
     TidyBuffer buf;
     tidyBufInit(&buf);
     tidyNodeGetText(doc, tnod, &buf);
     sanitize_entities((char *)buf.bp, destination, max_size - 1);
 
-    if (strlen((char *)destination) < max_size) {
-        destination[strlen((char *)destination) - 1] = '\0';
+    if (strlen(destination) < max_size) {
+        destination[strlen(destination) - 1] = '\0';
     } else {
         destination[max_size - 1] = '\0';
     }
@@ -109,7 +115,7 @@ void extract_text(TidyDoc doc, TidyNode tnod, char *destination, ulong max_size)
 }
 
 /* Traverse the document tree */
-int process_node(TidyDoc doc, TidyNode tnod, MarketPlace marketplace)
+int process_node(TidyDoc doc, TidyNode tnod, const MarketPlace marketplace)
 {
     TidyNode child;
     int tt = -1;
@@ -208,6 +214,10 @@ int process_node(TidyDoc doc, TidyNode tnod, MarketPlace marketplace)
                                 TidyNode a = tidyGetChild(td);
                                 TidyNode text = tidyGetChild(a);
                                 extract_text(doc, text, dataRow.marketcap, sizeof(dataRow.marketcap));
+                                // Replace dash with empty string
+                                if (0 == strcmp(dataRow.marketcap, "-")) {
+                                    strcpy(dataRow.marketcap, "");
+                                }
                             }
                             // Go to the next column
                             td = tidyGetNext(td);
@@ -242,7 +252,7 @@ int process_node(TidyDoc doc, TidyNode tnod, MarketPlace marketplace)
     return tt;
 }
 
-int finviz_parse_page_extract_symbols(struct MemoryStruct *chunk, MarketPlace marketplace)
+int finviz_parse_page_extract_symbols(struct MemoryStruct *chunk, const MarketPlace marketplace)
 {
     m = 0;
     int t = 0;
@@ -280,7 +290,7 @@ int finviz_parse_page_extract_symbols(struct MemoryStruct *chunk, MarketPlace ma
     return t;
 }
 
-void finviz_scrape_page(struct MemoryStruct *chunk, const MarketPlace marketplace)
+void finviz_scrape_page(struct MemoryStruct *chunk, const FINVIZ_MarketPlace finviz_marketplace, const MarketPlace marketplace)
 {
     CURLcode res;
 
@@ -292,16 +302,16 @@ void finviz_scrape_page(struct MemoryStruct *chunk, const MarketPlace marketplac
     strncpy(url, FINVIZ_URL, sizeof(url) - 1);
     url[sizeof(url) - 1] = '\0';
 
-    switch (marketplace) {
-        case AMEX:
+    switch (finviz_marketplace) {
+        case FINVIZ_MPLACE_AMEX:
             strncat(url, "&f=exch_amex", sizeof(url) - 1 - strlen(url));
         break;
 
-        case NYSE:
+        case FINVIZ_MPLACE_NYSE:
             strncat(url, "&f=exch_nyse", sizeof(url) - 1 - strlen(url));
         break;
 
-        case NASDAQ:
+        case FINVIZ_MPLACE_NASDAQ:
             strncat(url, "&f=exch_nasd", sizeof(url) - 1 - strlen(url));
         break;
 
@@ -333,7 +343,7 @@ void finviz_scrape_page(struct MemoryStruct *chunk, const MarketPlace marketplac
     // free(chunk->memory);
 }
 
-int ticker_scraper_scrape_finviz(const MarketPlace marketplace)
+int ticker_scraper_scrape_finviz_internal(const FINVIZ_MarketPlace finviz_marketplace, const MarketPlace marketplace)
 {
     struct MemoryStruct chunk;
 
@@ -349,10 +359,27 @@ int ticker_scraper_scrape_finviz(const MarketPlace marketplace)
             sleep(1);
         }
 
-        finviz_scrape_page(&chunk, marketplace);
+        finviz_scrape_page(&chunk, finviz_marketplace, marketplace);
     }
 
     nerd_trader_curl_cleanup(curl_handle);
 
     return new;
+}
+
+int ticker_scraper_scrape_finviz(const MarketPlace marketplace)
+{
+    int item_count = 0;
+
+    if (marketplace == NASDAQ) {
+        item_count += ticker_scraper_scrape_finviz_internal(FINVIZ_MPLACE_NASDAQ, NASDAQ);
+    } else if (marketplace == NYSE) {
+        item_count += ticker_scraper_scrape_finviz_internal(FINVIZ_MPLACE_NYSE, NYSE);
+        // Finviz requires NYSE American to be scraped separately, as legacy "AMEX"
+        item_count += ticker_scraper_scrape_finviz_internal(FINVIZ_MPLACE_AMEX, NYSE);
+    } else {
+        fprintf(stderr, "FINVIZ does not provide data for given marketplace\n");
+    }
+
+    return item_count;
 }

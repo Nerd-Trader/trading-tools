@@ -90,7 +90,7 @@ make -j historical-data-scraper
 ## How to run
 
 ```console
-bin/historical-data-scraper --min-price=0.1 --max-price=7.5 -o data/historical/ input.csv [input2.csv]
+bin/historical-data-scraper --min-price=0.1 --max-price=7.5 -o data/historical/ input.csv
 ```
 
 

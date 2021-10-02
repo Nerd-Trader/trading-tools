@@ -661,20 +661,20 @@ static const char *otcmarkets_industries[][2] = {
 };
 
 static const char otcmarkets_markets_otcqb[] = {
-    10 // OTCQB
+    10, // OTCQB
 };
 
 static const char otcmarkets_markets_otcqx[] = {
     6, // OTCQX International
     5, // OTCQX International Premier
     2, // UTCQX U.S.
-    1  // UTCQX U.S. Premier
+    1, // UTCQX U.S. Premier
 };
 
 static const char otcmarkets_markets_pink[] = {
     20, // Pink Current
     21, // Pink Limited
-    22  // Pink No Information
+    22, // Pink No Information
 };
 
 CURL *curl_handle;

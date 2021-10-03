@@ -72,7 +72,7 @@ The input is CSV files in the same format as the one that gets produced by ticke
 
 ## Dependencies
 
-`libcsv`, `libcurl`
+`libcsv`, `libcurl`, `libjson-c`
 
 
 ## How to build

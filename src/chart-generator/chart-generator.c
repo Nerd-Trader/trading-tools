@@ -15,17 +15,6 @@
 
 void explicit_bzero(void *s, size_t n);
 
-#define BUF_CHUNK_SIZE 40960
-
-typedef struct Candle {
-    double open;
-    double high;
-    double low;
-    double close;
-    int    volume;
-    int    datetime;
-} Candle;
-
 char output_path[2048] = ".";
 
 cairo_status_t write_image_file(void *closure, const unsigned char *data, const unsigned int length)

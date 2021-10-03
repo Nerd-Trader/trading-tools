@@ -1,13 +1,12 @@
 #pragma once
 
-#ifdef __GNUC__
-#define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
-#else
-#define UNUSED(x) UNUSED_ ## x
-#endif
+#include "common.h"
 
-#if !defined(__bool_true_false_are_defined) || __bool_true_false_are_defined == 0
-#define true  1
-#define false 0
-typedef char bool;
-#endif
+typedef struct Candle {
+    double open;
+    double high;
+    double low;
+    double close;
+    int    volume;
+    int    datetime;
+} Candle;

@@ -14,6 +14,6 @@ jobs:
     - name: Resolve dependencies
       run: |
         sudo apt-get update && \
-        sudo apt-get install libcsv-dev libcurl4-openssl-dev libtidy-dev
+        sudo apt-get install libcairo2-dev libcsv-dev libcurl4-openssl-dev libjson-c-dev libtidy-dev
     - name: Build
       run: make

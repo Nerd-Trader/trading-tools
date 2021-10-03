@@ -214,7 +214,6 @@ int main(const int argc, const char **argv)
     while (true) {
         opt = getopt_long(argc, (char**)argv, "o:p:P:m:M:h:", long_options, &option_index);
 
-        /* Detect the end of the options. */
         if (opt == -1) {
             break;
         }
@@ -270,19 +269,18 @@ int main(const int argc, const char **argv)
         }
     }
 
-    /* Print any remaining command line arguments (not options). */
     if (optind < argc) {
         // Ensure the output directory exists
         mkdir(output_path, S_IRWXU);
 
+        // Loop through non-flag/option arguments
         while (optind < argc) {
-            // Open and read input CSV file
+            // Open and read input CSV file line-by-line
             char file_path[strlen(argv[optind]) + 1];
             explicit_bzero(file_path, sizeof(file_path));
             strcpy(file_path, argv[optind++]);
-            fprintf(stderr, "Attempting to open input file %s…\n", file_path);
+
             if ((fp = fopen(file_path, "r"))) {
-                fprintf(stderr, "Successfully opened input file %s…\n", file_path);
                 // Parse CSV
                 while ((i = getc(fp)) != EOF) {
                     b = i;

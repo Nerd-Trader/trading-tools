@@ -14,7 +14,6 @@ typedef struct DataRow {
 } DataRow;
 
 char *escape_for_csv(const char *input);
-char *marketplace_to_str(const MarketPlace marketplace);
 
 int scrape_ticker_symbols(const MarketPlace marketplace);
 int ticker_scraper_add(const DataRow *dataRow);

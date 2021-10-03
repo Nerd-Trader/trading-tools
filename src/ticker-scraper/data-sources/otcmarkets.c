@@ -14,8 +14,6 @@
 
 #define OCTMARKETS_URL "https://www.otcmarkets.com/research/stock-screener/api/downloadCSV"
 
-void explicit_bzero(void *s, size_t n);
-
 static const char *otcmarkets_industries[][2] = {
     { "Abrasive, Asbestos & Misc Nonmetallic Mineral Prods", "3290" },
     { "Accident and health insurance", "6321" },

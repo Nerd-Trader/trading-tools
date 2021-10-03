@@ -6,12 +6,11 @@
 #include <sys/stat.h>
 
 #include <csv.h>
+#include <json-c/json.h>
 
 #include "config.h"
 #include "data-sources/tdameritrade.h"
 #include "historical-data-scraper.h"
-
-void explicit_bzero(void *s, size_t n);
 
 char output_path[2048] = ".";
 float min_price = 0.0f;
@@ -99,6 +98,16 @@ void csv_cb_end_of_row(int c, void *outfile)
             if (historical_data != NULL) {
                 fprintf(stderr, "✅");
 
+                struct json_object *parsed_json;
+                parsed_json = json_tokener_parse(historical_data);
+                free(historical_data);
+                json_object_object_add(parsed_json, "marketplace", json_object_new_string(marketplace_to_str(csv_input_data_row.marketplace)));
+                json_object_object_add(parsed_json, "company_name", json_object_new_string(csv_input_data_row.company));
+                json_object_object_add(parsed_json, "country", json_object_new_string(csv_input_data_row.country));
+                json_object_object_add(parsed_json, "sector", json_object_new_string(csv_input_data_row.sector));
+                json_object_object_add(parsed_json, "industry", json_object_new_string(csv_input_data_row.industry));
+                // TODO: add timestamp
+
                 // Write historical JSON data into <output dir>/<ticker>.json
                 FILE * fp;
                 char fpath[2048];
@@ -111,13 +120,14 @@ void csv_cb_end_of_row(int c, void *outfile)
                 fprintf(stderr, " → file ");
                 fp = fopen(fpath, "w");
                 if (fp != NULL) {
-                    fputs(historical_data, fp);
+                    fputs(json_object_to_json_string(parsed_json), fp);
                     fputs("\n", fp);
                     fprintf(stderr, "✅");
                     fclose(fp);
                 } else {
                     fprintf(stderr, "❌");
                 }
+
             } else {
                 fprintf(stderr, "❌");
             }
@@ -127,58 +137,6 @@ void csv_cb_end_of_row(int c, void *outfile)
 
     csv_input_row_index++;
     csv_input_field_index = 0;
-}
-
-long parse_marketcap_str(const char *mcap_str)
-{
-    long mcap = 0l;
-    long multiplier = 0l;
-
-    if (strlen(mcap_str) > 0) {
-        switch (mcap_str[strlen(mcap_str) - 1]) {
-            case 'K':
-                multiplier = 1000l;
-                break;
-            case 'M':
-                multiplier = 1000l * 1000l;
-                break;
-            case 'B':
-                multiplier = 1000l * 1000l * 1000l;
-                break;
-            case 'T':
-                multiplier = 1000l * 1000l * 1000l * 1000l;
-                break;
-        }
-
-        if (multiplier > 0l) {
-            char float_str[strlen(mcap_str)];
-            strcpy(float_str, mcap_str);
-            float_str[strlen(mcap_str) - 1] = '\0';
-
-            mcap = multiplier * atof(float_str);
-        } else {
-            mcap = atol(mcap_str);
-        }
-    }
-
-    return mcap;
-}
-
-MarketPlace str_to_marketplace(const char *mplace_str)
-{
-    if (strcmp(mplace_str, MPLACE_NASDAQ_STR) == 0) {
-        return MPLACE_NASDAQ;
-    } else if (strcmp(mplace_str, MPLACE_NYSE_STR) == 0) {
-        return MPLACE_NYSE;
-    } else if (strcmp(mplace_str, MPLACE_OTCQB_STR) == 0) {
-        return MPLACE_OTCQB;
-    } else if (strcmp(mplace_str, MPLACE_OTCQX_STR) == 0) {
-        return MPLACE_OTCQX;
-    } else if (strcmp(mplace_str, MPLACE_PINK_STR) == 0) {
-        return MPLACE_PINK;
-    }
-
-    return MPLACE_UNKNOWN;
 }
 
 int main(const int argc, const char **argv)

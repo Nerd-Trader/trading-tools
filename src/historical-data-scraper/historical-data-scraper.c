@@ -106,6 +106,7 @@ void csv_cb_end_of_row(int c, void *outfile)
                 json_object_object_add(parsed_json, "country", json_object_new_string(csv_input_data_row.country));
                 json_object_object_add(parsed_json, "sector", json_object_new_string(csv_input_data_row.sector));
                 json_object_object_add(parsed_json, "industry", json_object_new_string(csv_input_data_row.industry));
+                // TODO: add timestamp
 
                 // Write historical JSON data into <output dir>/<ticker>.json
                 FILE * fp;

@@ -110,19 +110,98 @@ void generate_chart(const char *buffer)
         cairo_set_source_rgb(cr, 0.03, 0.03, 0.03);
         cairo_paint(cr);
 
-#if CHART_IMAGE_RENDER_TICKER_NAME == true
-        // Slap stock ticker symbol onto the chart
-        cairo_save(cr);
+        // Text
         {
-            cairo_text_extents_t extents;
-            cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
-            cairo_set_font_size(cr, 200);
-            cairo_text_extents(cr, s_symbol, &extents);
-            cairo_move_to(cr, 0 + 10, extents.height + 10);
-            cairo_show_text(cr, s_symbol);
+            // Slap stock ticker symbol onto the chart
+            cairo_save(cr);
+            {
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 200);
+                cairo_text_extents(cr, s_symbol, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200);
+                cairo_show_text(cr, s_symbol);
+            }
+            cairo_restore(cr);
+
+            // Slap company name onto the chart
+            cairo_save(cr);
+            {
+                struct json_object *jo;
+                json_object_object_get_ex(parsed_json, "company_name", &jo);
+                const char *text = json_object_get_string(jo);
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 150);
+                cairo_text_extents(cr, text, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200);
+                cairo_show_text(cr, text);
+            }
+            cairo_restore(cr);
+
+            // Sector
+            cairo_save(cr);
+            {
+                struct json_object *jo;
+                json_object_object_get_ex(parsed_json, "sector", &jo);
+                const char *text = json_object_get_string(jo);
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 100);
+                cairo_text_extents(cr, text, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200);
+                cairo_show_text(cr, text);
+            }
+            cairo_restore(cr);
+
+            // Industry
+            cairo_save(cr);
+            {
+                struct json_object *jo;
+                json_object_object_get_ex(parsed_json, "industry", &jo);
+                const char *text = json_object_get_string(jo);
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 100);
+                cairo_text_extents(cr, text, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200 + 100);
+                cairo_show_text(cr, text);
+            }
+            cairo_restore(cr);
+
+            // Country
+            cairo_save(cr);
+            {
+                struct json_object *jo;
+                json_object_object_get_ex(parsed_json, "country", &jo);
+                const char *text = json_object_get_string(jo);
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 100);
+                cairo_text_extents(cr, text, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200 + 100 + 120);
+                cairo_show_text(cr, text);
+            }
+            cairo_restore(cr);
+
+            // Marketplace
+            cairo_save(cr);
+            {
+                struct json_object *jo;
+                json_object_object_get_ex(parsed_json, "marketplace", &jo);
+                const char *text = json_object_get_string(jo);
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 100);
+                cairo_text_extents(cr, text, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200 + 100 + 120 + 100);
+                cairo_show_text(cr, text);
+            }
+            cairo_restore(cr);
+
+            // TODO: add marketcap
+            // TODO: add timestamp
         }
-        cairo_restore(cr);
-#endif
 
         // Draw horizontal line that separates price and volume charts
         cairo_save(cr);

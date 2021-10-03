@@ -90,14 +90,32 @@ make -j historical-data-scraper
 ## How to run
 
 ```console
-bin/historical-data-scraper --min-price=0.1 --max-price=7.5 -o data/historical/ input.csv
+bin/historical-data-scraper --min-price=0.1 --max-price=7.5 -o data/historical/ nasdaq-and-pink.csv
 ```
 
 
 ## Sample output
 
 ```json
-
+{
+    "candles": [
+        {
+            "open": 25.5,
+            "high": 26.8485,
+            "low": 25.5,
+            "close": 26.1,
+            "volume": 2291,
+            "datetime": 1475470800000
+        }
+    ],
+    "symbol": "EYEG",
+    "empty": false,
+    "marketplace": "NASDAQ",
+    "company_name": "EyeGate Pharmaceuticals, Inc.",
+    "country": "USA",
+    "sector": "Healthcare",
+    "industry": "Biotechnology"
+}
 ```
 
 
@@ -121,7 +139,7 @@ make -j chart-generator
 ```
 
 
-## How to use
+## How to run
 
 ```console
 bin/chart-generator -o data/charts data/historical/*

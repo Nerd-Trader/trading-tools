@@ -25,3 +25,9 @@ typedef enum MarketPlaces {
 #define MPLACE_OTCQB_STR   "OTCQB"
 #define MPLACE_OTCQX_STR   "OTCQX"
 #define MPLACE_PINK_STR    "Pink"
+
+void explicit_bzero(void *s, size_t n);
+
+char *marketplace_to_str(const MarketPlace marketplace);
+long parse_marketcap_str(const char *mcap_str);
+MarketPlace str_to_marketplace(const char *mplace_str);

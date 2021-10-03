@@ -13,5 +13,3 @@ typedef struct DataRow {
     long        marketcap;
 } DataRow;
 
-long parse_marketcap_str(const char *mcap_str);
-MarketPlace str_to_marketplace(const char *mplace_str);

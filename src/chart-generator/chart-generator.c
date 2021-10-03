@@ -13,8 +13,6 @@
 #include "chart-generator.h"
 #include "config.h"
 
-void explicit_bzero(void *s, size_t n);
-
 char output_path[2048] = ".";
 
 cairo_status_t write_image_file(void *closure, const unsigned char *data, const unsigned int length)

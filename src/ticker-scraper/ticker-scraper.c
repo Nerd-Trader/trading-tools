@@ -13,8 +13,6 @@
 #include "data-sources/otcmarkets.h"
 #include "ticker-scraper.h"
 
-void explicit_bzero(void *s, size_t n);
-
 static const char *csv_output_columns[] = {
     "marketplace",
     "ticker",
@@ -47,36 +45,6 @@ void csv_cb_end_of_row(int c, void *outfile) {
     fputc('\n', (FILE *)outfile);
 
     csv_field_index = 0;
-}
-
-char *marketplace_to_str(const MarketPlace marketplace)
-{
-    switch (marketplace)
-    {
-        case MPLACE_NASDAQ:
-            return MPLACE_NASDAQ_STR;
-        break;
-
-        case MPLACE_NYSE:
-            return MPLACE_NYSE_STR;
-        break;
-
-        case MPLACE_OTCQB:
-            return MPLACE_OTCQB_STR;
-        break;
-
-        case MPLACE_OTCQX:
-            return MPLACE_OTCQX_STR;
-        break;
-
-        case MPLACE_PINK:
-            return MPLACE_PINK_STR;
-        break;
-
-        default:
-        case MPLACE_UNKNOWN:
-            return MPLACE_UNKNOWN_STR;
-    }
 }
 
 char *escape_for_csv(const char *input)

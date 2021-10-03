@@ -24,6 +24,7 @@ bin/$(TOOL_NAME_1): bin config
 	$(CC) \
         -I inc \
         -I inc/$(TOOL_NAME_1) \
+        src/common.c \
         src/curl.c \
         src/$(TOOL_NAME_1)/$(TOOL_NAME_1).c \
         src/$(TOOL_NAME_1)/data-sources/finviz.c \
@@ -37,17 +38,20 @@ bin/$(TOOL_NAME_2): bin config
 	$(CC) \
         -I inc \
         -I inc/$(TOOL_NAME_2) \
+        src/common.c \
         src/curl.c \
         src/$(TOOL_NAME_2)/$(TOOL_NAME_2).c \
         src/$(TOOL_NAME_2)/data-sources/tdameritrade.c \
         -lcsv \
         -lcurl \
+        -ljson-c \
         -o bin/$(TOOL_NAME_2)
 
 bin/$(TOOL_NAME_3): bin config
 	$(CC) \
         -I inc \
         -I inc/$(TOOL_NAME_3) \
+        src/common.c \
         src/$(TOOL_NAME_3)/$(TOOL_NAME_3).c \
         `pkg-config --cflags --libs cairo` \
         -ljson-c \

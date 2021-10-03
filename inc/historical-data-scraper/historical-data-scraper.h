@@ -10,7 +10,8 @@ typedef struct DataRow {
     char        sector[512];
     char        industry[512];
     char        country[512];
-    char        marketcap[512];
+    long        marketcap;
 } DataRow;
 
+long parse_marketcap_str(const char *mcap_str);
 MarketPlace str_to_marketplace(const char *mplace_str);

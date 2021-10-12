@@ -71,11 +71,11 @@ inc/config.h:
 	@cp inc/config.h.def inc/config.h
 
 run-$(TOOL_NAME_1): data
-	@bin/$(TOOL_NAME_1) US OTC > data/tickers.csv
+	@bin/$(TOOL_NAME_1) NASDAQ OTC > data/tickers.csv
 .PHONY: run-$(TOOL_NAME_1)
 
 run-$(TOOL_NAME_2): data
-	@bin/$(TOOL_NAME_2) -P 9.99 --include-missing-price -M 0.1B --include-missing-market-cap -o data/historical/ data/tickers.csv
+	@bin/$(TOOL_NAME_2) -P 8 --include-missing-price -M 0.15B --include-missing-market-cap -o data/historical/ data/tickers.csv
 .PHONY: run-$(TOOL_NAME_2)
 
 run-$(TOOL_NAME_3): data

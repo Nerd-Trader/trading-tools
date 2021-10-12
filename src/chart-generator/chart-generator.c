@@ -107,101 +107,8 @@ void generate_chart(const char *buffer)
         cairo_t *cr = cairo_create(surface);
         cairo_set_tolerance(cr, 0.00001);
         // Set background color for the image
-        cairo_set_source_rgb(cr, 0.03, 0.03, 0.03);
+        cairo_set_source_rgb(cr, 0, 0, 0);
         cairo_paint(cr);
-
-        // Text
-        {
-            // Slap stock ticker symbol onto the chart
-            cairo_save(cr);
-            {
-                cairo_text_extents_t extents;
-                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
-                cairo_set_font_size(cr, 200);
-                cairo_text_extents(cr, s_symbol, &extents);
-                cairo_move_to(cr, 0 + 20, extents.height + 200);
-                cairo_show_text(cr, s_symbol);
-            }
-            cairo_restore(cr);
-
-            // Slap company name onto the chart
-            cairo_save(cr);
-            {
-                struct json_object *jo;
-                json_object_object_get_ex(parsed_json, "company_name", &jo);
-                const char *text = json_object_get_string(jo);
-                cairo_text_extents_t extents;
-                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
-                cairo_set_font_size(cr, 150);
-                cairo_text_extents(cr, text, &extents);
-                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200);
-                cairo_show_text(cr, text);
-            }
-            cairo_restore(cr);
-
-            // Sector
-            cairo_save(cr);
-            {
-                struct json_object *jo;
-                json_object_object_get_ex(parsed_json, "sector", &jo);
-                const char *text = json_object_get_string(jo);
-                cairo_text_extents_t extents;
-                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
-                cairo_set_font_size(cr, 100);
-                cairo_text_extents(cr, text, &extents);
-                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200);
-                cairo_show_text(cr, text);
-            }
-            cairo_restore(cr);
-
-            // Industry
-            cairo_save(cr);
-            {
-                struct json_object *jo;
-                json_object_object_get_ex(parsed_json, "industry", &jo);
-                const char *text = json_object_get_string(jo);
-                cairo_text_extents_t extents;
-                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
-                cairo_set_font_size(cr, 100);
-                cairo_text_extents(cr, text, &extents);
-                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200 + 100);
-                cairo_show_text(cr, text);
-            }
-            cairo_restore(cr);
-
-            // Country
-            cairo_save(cr);
-            {
-                struct json_object *jo;
-                json_object_object_get_ex(parsed_json, "country", &jo);
-                const char *text = json_object_get_string(jo);
-                cairo_text_extents_t extents;
-                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
-                cairo_set_font_size(cr, 100);
-                cairo_text_extents(cr, text, &extents);
-                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200 + 100 + 120);
-                cairo_show_text(cr, text);
-            }
-            cairo_restore(cr);
-
-            // Marketplace
-            cairo_save(cr);
-            {
-                struct json_object *jo;
-                json_object_object_get_ex(parsed_json, "marketplace", &jo);
-                const char *text = json_object_get_string(jo);
-                cairo_text_extents_t extents;
-                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
-                cairo_set_font_size(cr, 100);
-                cairo_text_extents(cr, text, &extents);
-                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200 + 100 + 120 + 100);
-                cairo_show_text(cr, text);
-            }
-            cairo_restore(cr);
-
-            // TODO: add marketcap
-            // TODO: add timestamp
-        }
 
         // Draw horizontal line that separates price and volume charts
         cairo_save(cr);
@@ -242,7 +149,7 @@ void generate_chart(const char *buffer)
                     cairo_stroke(cr);
                 }
                 cairo_restore(cr);
-                // Add year indicator
+                // Add year text label
                 cairo_save(cr);
                 {
                     cairo_text_extents_t extents;
@@ -317,10 +224,98 @@ void generate_chart(const char *buffer)
                 const double pos_x = index * (CHART_IMAGE_VOLUMEBAR_WIDTH + CHART_IMAGE_VOLUMEBAR_SPACING) + ((i == 0) ? 0 : CHART_IMAGE_VOLUMEBAR_SPACING);
                 const double pos_y = image_height - height;
                 cairo_rectangle(cr, pos_x, pos_y, width, height);
-                cairo_set_source_rgba(cr, 1, 1, 1, 0.3);
+                if (is_bearish) {
+                    cairo_set_source_rgba(cr, 1, 0, 0, 0.3);
+                } else {
+                    cairo_set_source_rgba(cr, 0, 1, 0, 0.3);
+                }
                 cairo_fill(cr);
             }
             cairo_restore(cr);
+        }
+
+        // Text
+        {
+            // Slap stock ticker symbol onto the chart
+            cairo_save(cr);
+            {
+                char s_symbol_marketplace[32];
+                {
+                    struct json_object *jo;
+                    json_object_object_get_ex(parsed_json, "marketplace", &jo);
+                    sprintf(s_symbol_marketplace, "%s (%s)", s_symbol, json_object_get_string(jo));
+                }
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 200);
+                cairo_text_extents(cr, s_symbol_marketplace, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 180);
+                cairo_show_text(cr, s_symbol_marketplace);
+            }
+            cairo_restore(cr);
+
+            // Slap company name onto the chart
+            cairo_save(cr);
+            {
+                struct json_object *jo;
+                json_object_object_get_ex(parsed_json, "company_name", &jo);
+                const char *text = json_object_get_string(jo);
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 150);
+                cairo_text_extents(cr, text, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200);
+                cairo_show_text(cr, text);
+            }
+            cairo_restore(cr);
+
+            // Sector
+            cairo_save(cr);
+            {
+                struct json_object *jo;
+                json_object_object_get_ex(parsed_json, "sector", &jo);
+                const char *text = json_object_get_string(jo);
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 100);
+                cairo_text_extents(cr, text, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200);
+                cairo_show_text(cr, text);
+            }
+            cairo_restore(cr);
+
+            // Industry
+            cairo_save(cr);
+            {
+                struct json_object *jo;
+                json_object_object_get_ex(parsed_json, "industry", &jo);
+                const char *text = json_object_get_string(jo);
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 100);
+                cairo_text_extents(cr, text, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200 + 100);
+                cairo_show_text(cr, text);
+            }
+            cairo_restore(cr);
+
+            // Country
+            cairo_save(cr);
+            {
+                struct json_object *jo;
+                json_object_object_get_ex(parsed_json, "country", &jo);
+                const char *text = json_object_get_string(jo);
+                cairo_text_extents_t extents;
+                cairo_set_source_rgba(cr, 1, 1, 1, 0.1);
+                cairo_set_font_size(cr, 100);
+                cairo_text_extents(cr, text, &extents);
+                cairo_move_to(cr, 0 + 20, extents.height + 200 + 200 + 200 + 100 + 120);
+                cairo_show_text(cr, text);
+            }
+            cairo_restore(cr);
+
+            // TODO: add marketcap
+            // TODO: add timestamp
         }
 
         cairo_surface_flush(surface);

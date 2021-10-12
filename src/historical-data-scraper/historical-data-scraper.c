@@ -93,10 +93,9 @@ void csv_cb_end_of_row(int c, void *outfile)
             )
         ) {
             fprintf(stderr, "%s\t", csv_input_data_row.ticker);
-            fprintf(stderr, "data ");
             char *historical_data = historical_data_scraper_scrape_tdameritrade(&csv_input_data_row);
             if (historical_data != NULL) {
-                fprintf(stderr, "✅");
+                fprintf(stderr, "✅\n");
 
                 struct json_object *parsed_json;
                 parsed_json = json_tokener_parse(historical_data);
@@ -117,21 +116,14 @@ void csv_cb_end_of_row(int c, void *outfile)
                 strcat(fpath, csv_input_data_row.ticker);
                 strcat(fpath, ".json");
 
-                fprintf(stderr, " → file ");
-                fp = fopen(fpath, "w");
-                if (fp != NULL) {
+                if ((fp = fopen(fpath, "w")) != NULL) {
                     fputs(json_object_to_json_string(parsed_json), fp);
                     fputs("\n", fp);
-                    fprintf(stderr, "✅");
                     fclose(fp);
-                } else {
-                    fprintf(stderr, "❌");
                 }
-
             } else {
-                fprintf(stderr, "❌");
+                fprintf(stderr, "❌\n");
             }
-            fprintf(stderr, "\n");
         }
     }
 

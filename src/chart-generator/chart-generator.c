@@ -323,7 +323,7 @@ void generate_chart(const char *buffer)
         // Write output to file
         {
             char output_file_path[2048];
-            explicit_bzero(output_file_path, sizeof(output_file_path));
+            bzero(output_file_path, sizeof(output_file_path));
             strcpy(output_file_path, output_path);
             strcat(output_file_path, "/");
             strcat(output_file_path, s_symbol);

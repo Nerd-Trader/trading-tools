@@ -686,7 +686,7 @@ void otcmarkets_csv_cb_end_of_field(void *s, size_t l, void *outfile) {
     if (otcmarkets_csv_row_index > 0) {
         int field_value_len = l + 1;
         char string[field_value_len];
-        explicit_bzero(string, sizeof(string));
+        bzero(string, sizeof(string));
         memcpy(&string, s, l);
         string[field_value_len] = '\0';
 
@@ -738,7 +738,7 @@ int otcmarkets_parse_data_from_csv(struct MemoryStruct *chunk, const MarketPlace
     strncpy(otcmarkets_data_row.industry, industry[0], sizeof(otcmarkets_data_row.industry) - 1);
 
     /* Sector data is not provided by otcmarkets.com */
-    explicit_bzero(otcmarkets_data_row.sector, sizeof(otcmarkets_data_row.sector));
+    bzero(otcmarkets_data_row.sector, sizeof(otcmarkets_data_row.sector));
 
     if (csv_init(&parser, csv_options) != 0) {
         fprintf(stderr, "Error: Couldn’t initialize CSV parser\n");

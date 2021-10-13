@@ -38,26 +38,26 @@ void csv_cb_end_of_field(void *s, size_t l, void *outfile)
                 csv_input_data_row.marketplace = str_to_marketplace(string);
                 break;
             case 1:
-                explicit_bzero(csv_input_data_row.ticker, sizeof(Symbol));
+                bzero(csv_input_data_row.ticker, sizeof(Symbol));
                 memcpy(csv_input_data_row.ticker, string, l);
                 break;
             case 2:
-                explicit_bzero(csv_input_data_row.company, sizeof(csv_input_data_row.company));
+                bzero(csv_input_data_row.company, sizeof(csv_input_data_row.company));
                 memcpy(csv_input_data_row.company, string, l);
                 break;
             case 3:
                 csv_input_data_row.price = atof(string);
                 break;
             case 4:
-                explicit_bzero(csv_input_data_row.sector, sizeof(csv_input_data_row.sector));
+                bzero(csv_input_data_row.sector, sizeof(csv_input_data_row.sector));
                 memcpy(csv_input_data_row.sector, string, l);
                 break;
             case 5:
-                explicit_bzero(csv_input_data_row.industry, sizeof(csv_input_data_row.industry));
+                bzero(csv_input_data_row.industry, sizeof(csv_input_data_row.industry));
                 memcpy(csv_input_data_row.industry, string, l);
                 break;
             case 6:
-                explicit_bzero(csv_input_data_row.country, sizeof(csv_input_data_row.country));
+                bzero(csv_input_data_row.country, sizeof(csv_input_data_row.country));
                 memcpy(csv_input_data_row.country, string, l);
                 break;
             case 7:
@@ -110,7 +110,7 @@ void csv_cb_end_of_row(int c, void *outfile)
                 // Write historical JSON data into <output dir>/<ticker>.json
                 FILE * fp;
                 char fpath[2048];
-                explicit_bzero(fpath, sizeof(fpath));
+                bzero(fpath, sizeof(fpath));
                 strcat(fpath, output_path);
                 strcat(fpath, "/");
                 strcat(fpath, csv_input_data_row.ticker);
@@ -180,7 +180,7 @@ int main(const int argc, const char **argv)
             case 'P':
                 {
                     char value_str[32];
-                    explicit_bzero(value_str, sizeof(value_str));
+                    bzero(value_str, sizeof(value_str));
                     memcpy(value_str, optarg, strlen(optarg));
                     float value = atof(value_str);
                     if (opt == 'p') {
@@ -227,7 +227,7 @@ int main(const int argc, const char **argv)
         while (optind < argc) {
             // Open and read input CSV file line-by-line
             char file_path[strlen(argv[optind]) + 1];
-            explicit_bzero(file_path, sizeof(file_path));
+            bzero(file_path, sizeof(file_path));
             strcpy(file_path, argv[optind++]);
 
             if ((fp = fopen(file_path, "r"))) {

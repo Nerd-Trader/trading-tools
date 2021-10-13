@@ -1,11 +1,11 @@
 #pragma once
 
 // Tool 1 & Tool 2
-#define DEBUG                 false
-#define USER_AGENT            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:92.0) Gecko/20100101 Firefox/92.0"
+#define DEBUG                            false
+#define USER_AGENT                       "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:92.0) Gecko/20100101 Firefox/92.0"
 
 // Tool 2
-#define TD_AMERITRADE_API_KEY ""
+#define TD_AMERITRADE_API_KEY            ""
 
 // Tool 3
 #define CHART_IMAGE_HEIGHT               4800
@@ -14,4 +14,4 @@
 #define CHART_IMAGE_VOLUMEBAR_WIDTH      3
 #define CHART_IMAGE_VOLUMEBAR_SPACING    1
 #define CHART_IMAGE_VOLUMEBAR_MAX_HEIGHT 500
-#define CHART_IMAGE_VERTICAL_PRICE_SCALE 8
+#define CHART_IMAGE_VERTICAL_PRICE_SCALE 5

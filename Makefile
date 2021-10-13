@@ -75,7 +75,7 @@ run-$(TOOL_NAME_1): data
 .PHONY: run-$(TOOL_NAME_1)
 
 run-$(TOOL_NAME_2): data
-	@bin/$(TOOL_NAME_2) -P 8 --include-missing-price -M 0.15B --include-missing-market-cap -o data/historical/ data/tickers.csv
+	@bin/$(TOOL_NAME_2) -P 5 --include-missing-price -M 0.5B --include-missing-market-cap -o data/historical/ data/tickers.csv
 .PHONY: run-$(TOOL_NAME_2)
 
 run-$(TOOL_NAME_3): data

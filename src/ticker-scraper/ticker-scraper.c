@@ -53,7 +53,7 @@ char *escape_for_csv(const char *input)
     size_t temp_len = input_len*2 + 2;
     char *temp = malloc(temp_len);
 
-    explicit_bzero(temp, temp_len);
+    bzero(temp, temp_len);
 
     csv_write(temp, temp_len, input, input_len);
 
@@ -200,7 +200,7 @@ int main(const int argc, const char **argv)
     if (is_allowed_to_output_csv_header) {
         const int csv_header_mem_len = csv_output_column_count-1 + csv_output_column_count * sizeof(csv_output_columns[0]) + 1;
         char csv_header[csv_header_mem_len];
-        explicit_bzero(csv_header, csv_header_mem_len);
+        bzero(csv_header, csv_header_mem_len);
         for(int i = 0; i < csv_output_column_count; i++) {
             const char delimeter[2] = { csv_get_delim(&parser), 0 };
             if (i > 0) {

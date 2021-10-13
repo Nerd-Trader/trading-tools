@@ -5,10 +5,13 @@
 #include <unistd.h>
 
 #include <curl/curl.h>
-typedef unsigned int uint; /* Needed by tidy/tidyplatform.h */
-typedef unsigned long ulong; /* Needed by tidy/tidy.h */
-#include <tidy/tidy.h>
+typedef unsigned int uint;
+#if __APPLE__
+#include <tidybuffio.h>
+#else
+typedef unsigned long ulong;
 #include <tidy/tidybuffio.h>
+#endif
 
 #include "config.h"
 #include "curl.h"

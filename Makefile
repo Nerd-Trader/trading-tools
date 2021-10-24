@@ -22,6 +22,7 @@ $(TOOL_NAME_3): bin/$(TOOL_NAME_3)
 
 bin/$(TOOL_NAME_1): bin config
 	$(CC) \
+        -DPROG="\"$(TOOL_NAME_1)\"" \
         -I inc \
         -I inc/$(TOOL_NAME_1) \
         src/common.c \
@@ -36,6 +37,7 @@ bin/$(TOOL_NAME_1): bin config
 
 bin/$(TOOL_NAME_2): bin config
 	$(CC) \
+        -DPROG="\"$(TOOL_NAME_2)\"" \
         -I inc \
         -I inc/$(TOOL_NAME_2) \
         src/common.c \
@@ -49,6 +51,7 @@ bin/$(TOOL_NAME_2): bin config
 
 bin/$(TOOL_NAME_3): bin config
 	$(CC) \
+        -DPROG="\"$(TOOL_NAME_3)\"" \
         -I inc \
         -I inc/$(TOOL_NAME_3) \
         src/common.c \

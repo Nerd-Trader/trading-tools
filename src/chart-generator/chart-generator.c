@@ -25,15 +25,16 @@ void generate_chart(const char *buffer)
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(buffer);
 
+    struct json_object *symbol;
+    json_object_object_get_ex(parsed_json, "symbol", &symbol);
+    const char *s_symbol = json_object_get_string(symbol);
+
     struct json_object *empty;
     json_object_object_get_ex(parsed_json, "empty", &empty);
 
-    if (!json_object_get_boolean(empty)) {
-        struct json_object *symbol;
-        json_object_object_get_ex(parsed_json, "symbol", &symbol);
-        const char *s_symbol = json_object_get_string(symbol);
+    fprintf(stderr, "Generating chart for ticker %s…", s_symbol);
 
-        fprintf(stderr, "%s\n", s_symbol);
+    if (!json_object_get_boolean(empty)) {
 
         struct json_object *candles_array;
         json_object_object_get_ex(parsed_json, "candles", &candles_array);
@@ -340,6 +341,10 @@ void generate_chart(const char *buffer)
 
         cairo_destroy(cr);
         cairo_surface_destroy(surface);
+
+        fprintf(stderr, "\t✅\n");
+    } else {
+        fprintf(stderr, "\t❌\n");
     }
 }
 

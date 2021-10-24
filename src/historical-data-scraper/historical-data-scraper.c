@@ -95,7 +95,7 @@ void csv_cb_end_of_row(int c, void *outfile)
             fprintf(stderr, "Obtaining historical data for ticker %s…", csv_input_data_row.ticker);
             char *historical_data = historical_data_scraper_scrape_tdameritrade(&csv_input_data_row);
             if (historical_data != NULL) {
-                fprintf(stderr, "\t✅\n");
+                fprintf(stderr, " ✅\n");
 
                 struct json_object *parsed_json;
                 parsed_json = json_tokener_parse(historical_data);
@@ -122,7 +122,7 @@ void csv_cb_end_of_row(int c, void *outfile)
                     fclose(fp);
                 }
             } else {
-                fprintf(stderr, "\t❌\n");
+                fprintf(stderr, " ❌\n");
             }
         }
     }

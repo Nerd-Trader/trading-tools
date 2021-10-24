@@ -342,9 +342,9 @@ void generate_chart(const char *buffer)
         cairo_destroy(cr);
         cairo_surface_destroy(surface);
 
-        fprintf(stderr, "\t✅\n");
+        fprintf(stderr, " ✅\n");
     } else {
-        fprintf(stderr, "\t❌\n");
+        fprintf(stderr, " ❌\n");
     }
 }
 
